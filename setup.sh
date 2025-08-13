@@ -7,7 +7,7 @@
 # Author(s): Raghav Kansal
 #############################################################
 
-CMSSW_VER=CMSSW_14_2_2
+CMSSW_VER=CMSSW_15_1_0_pre5
 this_file="$( [ ! -z "$ZSH_VERSION" ] && echo "${(%):-%x}" || echo "${BASH_SOURCE[0]}" )"
 this_dir="$( cd "$( dirname "$this_file" )" && pwd )"
 
