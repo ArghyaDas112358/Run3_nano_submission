@@ -9,7 +9,7 @@
 
 NEVENTS=10
 NTHREADS=4
-ERA=Run3
+ERA=Run3_2024
 
 base_args="--customise DAZSLE/DAZSLE/customize.customize --step NANO:@BTV --scenario pp --customise_commands=\"process.add_(cms.Service('InitRootHandlers',EnableIMT=cms.untracked.bool(False)));process.MessageLogger.cerr.FwkReport.reportEvery=1000\" --no_exec -n $NEVENTS --nThreads $NTHREADS --era $ERA"
 mc_args="--eventcontent NANOAODSIM --datatier NANOAODSIM --mc"
