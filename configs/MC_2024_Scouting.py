@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: MC_2024_Scouting -s NANO:@GENFromMini+@Scout --process NANO -n 10 --nThreads 4 --era Run3 --python_file MC_2024_Scouting.py --eventcontent NANOAODSIM --datatier NANOAODSIM --mc --no_exec --fileout file:MC_2024_Scouting.root --conditions auto:phase1_2024_realistic --filein /store/mc/Run3Winter24MiniAOD/GluGlutoHHto2B2Tau_kl-0p00_kt-1p00_c2-0p00_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/133X_mcRun3_2024_realistic_v9-v3/2820000/6fde14c0-c8c4-4425-b57c-647f62654d98.root --customise_commands=process.NANOAODSIMoutput.outputCommands.append('keep edmTriggerResults_*_*_*')
+# with command line options: MC_2024_Scouting -s NANO:@GENFromMini+@Scout --process NANO -n 10 --nThreads 4 --era Run3 --python_file MC_2024_Scouting.py --customise_commands="process.NANOAODSIMoutput.outputCommands.append()" --no_exec --eventcontent NANOAODSIM --datatier NANOAODSIM --mc --fileout file:MC_2024_Scouting.root --conditions auto:phase1_2024_realistic --filein /store/mc/Run3Winter24MiniAOD/GluGlutoHHto2B2Tau_kl-0p00_kt-1p00_c2-0p00_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/133X_mcRun3_2024_realistic_v9-v3/2820000/6fde14c0-c8c4-4425-b57c-647f62654d98.root
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.Eras.Era_Run3_cff import Run3
@@ -93,7 +93,7 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2024_realistic', '
 
 # Path and EndPath definitions
 process.nanoAOD_step0 = cms.Path(process.nanogenSequence)
-process.nanoAOD_step1 = cms.Path(process.nanoSequenceMC)
+process.nanoAOD_step1 = cms.Path(process.scoutingNanoSequence)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.NANOAODSIMoutput_step = cms.EndPath(process.NANOAODSIMoutput)
 
@@ -114,12 +114,19 @@ from PhysicsTools.NanoAOD.nanogen_cff import customizeNanoGENFromMini
 #call to customisation function customizeNanoGENFromMini imported from PhysicsTools.NanoAOD.nanogen_cff
 process = customizeNanoGENFromMini(process)
 
+# Automatic addition of the customisation function from PhysicsTools.NanoAOD.custom_run3scouting_cff
+from PhysicsTools.NanoAOD.custom_run3scouting_cff import customiseScoutingNano 
+
+#call to customisation function customiseScoutingNano imported from PhysicsTools.NanoAOD.custom_run3scouting_cff
+process = customiseScoutingNano(process)
+
 # End of customisation functions
 
 
 # Customisation from command line
 
-process.NANOAODSIMoutput.outputCommands.append('keep edmTriggerResults_*_*_*')
+"process.NANOAODSIMoutput.outputCommands.append()"
+process.source.delayReadingEventProducts = cms.untracked.bool(False)
 # Add early deletion of temporary data products to reduce peak memory need
 from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete
 process = customiseEarlyDelete(process)
