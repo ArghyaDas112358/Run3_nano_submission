@@ -12,10 +12,16 @@ NTHREADS=4
 ERA=Run3
 
 base_args="--customise DAZSLE/DAZSLE/customize.customize --step NANO:@BTV --scenario pp --customise_commands=\"process.add_(cms.Service('InitRootHandlers',EnableIMT=cms.untracked.bool(False)));process.MessageLogger.cerr.FwkReport.reportEvery=1000\" --no_exec -n $NEVENTS --nThreads $NTHREADS --era $ERA"
-base_args_mc="$base_args --eventcontent NANOAODSIM --datatier NANOAODSIM --mc"
-base_args_data="$base_args --eventcontent NANOAOD --datatier NANOAOD --data"
+mc_args="--eventcontent NANOAODSIM --datatier NANOAODSIM --mc"
+data_args="--eventcontent NANOAOD --datatier NANOAOD --data"
+args_mc="$base_args $mc_args"
+args_data="$base_args $data_args"
 
-echo $base_args_mc
+#base_args_scouting="--no_exec -n $NEVENTS --nThreads $NTHREADS --era $ERA" #--customise DAZSLE/DAZSLE/customize.customize --scenario pp  --customise_commands=\"process.add_(cms.Service('InitRootHandlers',EnableIMT=cms.untracked.bool(False)));process.MessageLogger.cerr.FwkReport.reportEvery=1000\"
+scouting_args="-s NANO:@GENFromMini+@Scout --process NANO -n $NEVENTS --nThreads $NTHREADS --era $ERA  --python_file $name.py --customise_commands=\"process.NANOAODSIMoutput.outputCommands.append(`keep edmTriggerResults_*_*_*`)\" --no_exec"
+scouting_args_mc="$scouting_args $mc_args" #$base_args_scouting 
+
+echo $args_mc
 
 ############# MC #############
 
@@ -25,29 +31,37 @@ echo $base_args_mc
 name=MC_preEE2022
 gt=140X_mcRun3_2022_realistic_v12
 filein=/store/mc/Run3Summer22MiniAODv4/QCD_PT-15to20_MuEnrichedPt5_TuneCP5_13p6TeV_pythia8/MINIAODSIM/130X_mcRun3_2022_realistic_v5-v2/2520000/056b90db-c5cf-4f5f-a4cb-1c69bf4e65b5.root
-cmsDriver.py $name --fileout file:$name.root --conditions $gt --filein $filein $base_args_mc
+cmsDriver.py $name --fileout file:$name.root --conditions $gt --filein $filein $args_mc
 
 name=MC_postEE2022
 gt=140X_mcRun3_2022_realistic_v12
 filein=/store/mc/Run3Summer22EEMiniAODv4/VBFHHto2B2Tau_CV_1_C2V_0_C3_1_TuneCP5_13p6TeV_madgraph-pythia8/MINIAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2520000/64400fec-6979-4a7e-8737-2c4219ecb1be.root
-cmsDriver.py $name --fileout file:$name.root --conditions $gt --filein $filein $base_args_mc
+cmsDriver.py $name --fileout file:$name.root --conditions $gt --filein $filein $args_mc
 
 name=MC_preBPix2023
 gt=140X_mcRun3_2023_realistic_v9
 filein=/store/mc/Run3Summer23BPixMiniAODv4/DYTo2L_MLL-4to50_TuneCP5_13p6TeV_pythia8/MINIAODSIM/130X_mcRun3_2023_realistic_postBPix_v2-v1/60000/661a9e9a-e693-4216-9ea1-8d03793951ab.root
-cmsDriver.py $name --fileout file:$name.root --conditions $gt --filein $filein $base_args_mc
+cmsDriver.py $name --fileout file:$name.root --conditions $gt --filein $filein $args_mc
 
 name=MC_postBPix2023
 gt=140X_mcRun3_2023_realistic_v9
 filein=/store/mc/Run3Summer23BPixMiniAODv4/DYTo2L_MLL-4to50_TuneCP5_13p6TeV_pythia8/MINIAODSIM/130X_mcRun3_2023_realistic_postBPix_v2-v1/60000/661a9e9a-e693-4216-9ea1-8d03793951ab.root
-cmsDriver.py $name --fileout file:$name.root --conditions $gt --filein $filein $base_args_mc
+cmsDriver.py $name --fileout file:$name.root --conditions $gt --filein $filein $args_mc
 
 # 2024 MC
 # GT: latest one from https://docs.google.com/presentation/d/1EHxQcWzw8IxPgCn8hm1prwSP-EktFtiuaEzH8WkQNVY/edit?slide=id.g34e821b3a62_2_0#slide=id.g34e821b3a62_2_0
 name=MC_2024
 gt=140X_mcRun3_2024_realistic_v26
 filein=/store/mc/RunIII2024Summer24MiniAOD/QCD-4Jets_Bin-HT-1000to1200_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/100000/00f7403b-49bf-4efd-9b8f-0398bd61d910.root
-cmsDriver.py $name --fileout file:$name.root --conditions $gt --filein $filein $base_args_mc
+cmsDriver.py $name --fileout file:$name.root --conditions $gt --filein $filein $args_mc --python_file $name.py 
+
+
+############# Scouting MC #############
+
+name=MC_2024_Scouting
+gt=auto:phase1_2024_realistic
+filein=/store/mc/Run3Winter24MiniAOD/GluGlutoHHto2B2Tau_kl-0p00_kt-1p00_c2-0p00_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/133X_mcRun3_2024_realistic_v9-v3/2820000/6fde14c0-c8c4-4425-b57c-647f62654d98.root #/store/mc/Run3Winter24MiniAOD/GluGlutoHHto2B2Tau_kl-0p00_kt-1p00_c2-0p00_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/133X_mcRun3_2024_realistic_v9-v3/2820000/a55161f6-8a99-47ed-a158-063e3726e97c.root
+cmsDriver.py $name $scouting_args_mc --fileout file:$name.root --conditions $gt --filein $filein  
 
 ############# DATA #############
 
@@ -56,22 +70,22 @@ gt=140X_dataRun3_v20
 
 name=DATA_2022
 filein=/store/data/Run2022E/BTagMu/MINIAOD/22Sep2023-v1/2530000/004c666b-bfd9-4e91-b15b-8f7bb1587e75.root
-cmsDriver.py $name --fileout file:$name.root --conditions $gt --filein $filein $base_args_data
+cmsDriver.py $name --fileout file:$name.root --conditions $gt --filein $filein $args_data
 
 # 2023 data
 name=DATA_2023
 filein=/store/data/Run2023C/BTagMu/MINIAOD/22Sep2023_v2-v1/2540000/0a4d9d3c-566d-48f2-886d-fbd4d5d513cf.root
-cmsDriver.py $name --fileout file:$name.root --conditions $gt --filein $filein $base_args_data
+cmsDriver.py $name --fileout file:$name.root --conditions $gt --filein $filein $args_data
 
 # 2024 data
 name=DATA_2024
 filein=/store/data/Run2024E/BTagMu/MINIAOD/2024CDEReprocessing-v1/120000/0f8aeefe-1ccd-44a1-ba6d-dcb521f34188.root
-cmsDriver.py $name --fileout file:$name.root --conditions $gt --filein $filein $base_args_data
+cmsDriver.py $name --fileout file:$name.root --conditions $gt --filein $filein $args_data
 
 
 ############# Customization #############
 
 # Replace BTVCustomNanoAOD with BTVCustomNanoAOD_AK8 in all generated files for saving AK8 jet pf candidates
-for file in *.py; do
-    sed -i 's/BTVCustomNanoAOD/BTVCustomNanoAOD_AK8/g' "$file"
-done
+#for file in *.py; do
+#    sed -i 's/BTVCustomNanoAOD/BTVCustomNanoAOD_AK8/g' "$file"
+#done
