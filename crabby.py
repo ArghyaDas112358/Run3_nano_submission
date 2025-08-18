@@ -42,6 +42,13 @@ CONFIGS = {
         "2023BPix": "MC_postBPix2023_NANO.py",
         "2024": "MC_2024_NANO.py",
     },
+    "mcscouting": {
+        "2022": "MC_preEE2022_NANO.py",
+        "2022EE": "MC_postEE2022_NANO.py",
+        "2023": "MC_preBPix2023_NANO.py",
+        "2023BPix": "MC_postBPix2023_NANO.py",
+        "2024": "MC_2024_Scouting.py",
+    },
 }
 
 JSONS = {
@@ -234,6 +241,9 @@ def parse_args():
         choices={True, False},
         help="Test submit - only 1 file, don't publish.",
     )
+    parser.add_argument(
+        "--scouting", default=False, action="store_true", help="Produce scouting samples"
+    )
     args = parser.parse_args()
 
     return args
@@ -251,6 +261,8 @@ def main(args):
 
     isData = args.dataset in DATASETS
     dlabel = "data" if isData else "mc"
+    if args.scouting: 
+        dlabel = "mcscouting" 
     # mc_campaign = MC_CAMPAIGNS[args.year]
     # miniaod_version = "MINIAODv4"
     if isData:
