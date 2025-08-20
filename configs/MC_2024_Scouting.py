@@ -93,7 +93,7 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2024_realistic', '
 
 # Path and EndPath definitions
 process.nanoAOD_step0 = cms.Path(process.nanogenSequence)
-process.nanoAOD_step1 = cms.Path(process.scoutingNanoSequence)
+process.nanoAOD_step1 = cms.Path(process.nanoSequenceMC)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.NANOAODSIMoutput_step = cms.EndPath(process.NANOAODSIMoutput)
 
@@ -114,19 +114,12 @@ from PhysicsTools.NanoAOD.nanogen_cff import customizeNanoGENFromMini
 #call to customisation function customizeNanoGENFromMini imported from PhysicsTools.NanoAOD.nanogen_cff
 process = customizeNanoGENFromMini(process)
 
-# Automatic addition of the customisation function from PhysicsTools.NanoAOD.custom_run3scouting_cff
-from PhysicsTools.NanoAOD.custom_run3scouting_cff import customiseScoutingNano 
-
-#call to customisation function customiseScoutingNano imported from PhysicsTools.NanoAOD.custom_run3scouting_cff
-process = customiseScoutingNano(process)
-
 # End of customisation functions
 
 
 # Customisation from command line
 
 "process.NANOAODSIMoutput.outputCommands.append()"
-process.source.delayReadingEventProducts = cms.untracked.bool(False)
 # Add early deletion of temporary data products to reduce peak memory need
 from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete
 process = customiseEarlyDelete(process)
