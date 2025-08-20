@@ -209,7 +209,7 @@ def status(card, datasets):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--user", required=True, type=str, help="username for storing files")
+    parser.add_argument("--user", required=False, default="", type=str, help="username for storing files")
     parser.add_argument(
         "--year",
         required=True,
@@ -245,6 +245,9 @@ def parse_args():
         "--scouting", default=False, action="store_true", help="Produce scouting samples"
     )
     args = parser.parse_args()
+
+    if (args.user == ""): 
+        args.user = os.environ['USER'].split("-")[0]
 
     return args
 
