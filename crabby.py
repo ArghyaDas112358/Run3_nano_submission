@@ -244,10 +244,15 @@ def parse_args():
     parser.add_argument(
         "--scouting", default=False, action="store_true", help="Produce scouting samples"
     )
+    parser.add_argument("--campain", required=False, default="", type=str, help="Production campagn")
     args = parser.parse_args()
 
     if (args.user == ""): 
         args.user = os.environ['USER'].split("-")[0]
+
+    if (args.campain != ""): 
+        global TAG
+        TAG = args.campain
 
     return args
 
