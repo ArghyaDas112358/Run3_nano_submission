@@ -265,7 +265,7 @@ def main(args):
     isData = args.dataset in DATASETS
     dlabel = "data" if isData else "mc"
     if args.scouting: 
-        dlabel = "mcscouting" 
+        dlabel = "datascouting" if isData else "mcscouting" 
     # mc_campaign = MC_CAMPAIGNS[args.year]
     # miniaod_version = "MINIAODv4"
     if isData:
