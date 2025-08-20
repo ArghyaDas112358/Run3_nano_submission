@@ -2,12 +2,12 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: MC_2024_Scouting -s NANO:@GENFromMini+@Scout --process NANO -n 10 --nThreads 4 --era Run3 --python_file MC_2024_Scouting.py --customise_commands="process.NANOAODSIMoutput.outputCommands.append()" --no_exec --eventcontent NANOAODSIM --datatier NANOAODSIM --mc --fileout file:MC_2024_Scouting.root --conditions auto:phase1_2024_realistic --filein /store/mc/Run3Winter24MiniAOD/GluGlutoHHto2B2Tau_kl-0p00_kt-1p00_c2-0p00_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/133X_mcRun3_2024_realistic_v9-v3/2820000/6fde14c0-c8c4-4425-b57c-647f62654d98.root
+# with command line options: --python_file MC_2024_Scouting.py -s NANO:@GENFromMini+@Scout --process NANO -n 10 --nThreads 4 --era Run3_2024 --customise_commands="process.NANOAODSIMoutput.outputCommands.append()" --no_exec --eventcontent NANOAODSIM --datatier NANOAODSIM --mc --fileout file:MC_2024_Scouting.py.root --conditions auto:phase1_2024_realistic --filein /store/mc/RunIII2024Summer24MiniAODv6/GluGluHHto2B2Tau_Par-c2-0p00-kl-0p00-kt-1p00_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/PowhegBugFix_150X_mcRun3_2024_realistic_v2-v2/2520000/02adb734-559d-4c0e-997d-984f4ef0f62e.root
 import FWCore.ParameterSet.Config as cms
 
-from Configuration.Eras.Era_Run3_cff import Run3
+from Configuration.Eras.Era_Run3_2024_cff import Run3_2024
 
-process = cms.Process('NANO',Run3)
+process = cms.Process('NANO',Run3_2024)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -29,7 +29,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('/store/mc/Run3Winter24MiniAOD/GluGlutoHHto2B2Tau_kl-0p00_kt-1p00_c2-0p00_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/133X_mcRun3_2024_realistic_v9-v3/2820000/6fde14c0-c8c4-4425-b57c-647f62654d98.root'),
+    fileNames = cms.untracked.vstring('/store/mc/RunIII2024Summer24MiniAODv6/GluGluHHto2B2Tau_Par-c2-0p00-kl-0p00-kt-1p00_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/PowhegBugFix_150X_mcRun3_2024_realistic_v2-v2/2520000/02adb734-559d-4c0e-997d-984f4ef0f62e.root'),
     secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -67,7 +67,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('MC_2024_Scouting nevts:10'),
+    annotation = cms.untracked.string('--python_file nevts:10'),
     name = cms.untracked.string('Applications'),
     version = cms.untracked.string('$Revision: 1.19 $')
 )
@@ -81,7 +81,7 @@ process.NANOAODSIMoutput = cms.OutputModule("NanoAODOutputModule",
         dataTier = cms.untracked.string('NANOAODSIM'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:MC_2024_Scouting.root'),
+    fileName = cms.untracked.string('file:MC_2024_Scouting.py.root'),
     outputCommands = process.NANOAODSIMEventContent.outputCommands
 )
 

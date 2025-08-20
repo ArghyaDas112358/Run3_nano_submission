@@ -18,7 +18,7 @@ args_mc="$base_args $mc_args"
 args_data="$base_args $data_args"
 
 #base_args_scouting="--no_exec -n $NEVENTS --nThreads $NTHREADS --era $ERA" #--customise DAZSLE/DAZSLE/customize.customize --scenario pp  --customise_commands=\"process.add_(cms.Service('InitRootHandlers',EnableIMT=cms.untracked.bool(False)));process.MessageLogger.cerr.FwkReport.reportEvery=1000\"
-scouting_args="-s NANO:@GENFromMini+@Scout --process NANO -n $NEVENTS --nThreads $NTHREADS --era $ERA  --python_file $name.py --customise_commands=\"process.NANOAODSIMoutput.outputCommands.append(`keep edmTriggerResults_*_*_*`)\" --no_exec"
+scouting_args="-s NANO:@GENFromMini+@Scout --process NANO -n $NEVENTS --nThreads $NTHREADS --era $ERA  --customise_commands=\"process.NANOAODSIMoutput.outputCommands.append(`keep edmTriggerResults_*_*_*`)\" --no_exec"
 scouting_args_mc="$scouting_args $mc_args" #$base_args_scouting 
 
 echo $args_mc
@@ -53,15 +53,15 @@ cmsDriver.py $name --fileout file:$name.root --conditions $gt --filein $filein $
 name=MC_2024
 gt=140X_mcRun3_2024_realistic_v26
 filein=/store/mc/RunIII2024Summer24MiniAOD/QCD-4Jets_Bin-HT-1000to1200_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/100000/00f7403b-49bf-4efd-9b8f-0398bd61d910.root
-cmsDriver.py $name --fileout file:$name.root --conditions $gt --filein $filein $args_mc --python_file $name.py 
+cmsDriver.py $name --fileout file:$name.root --conditions $gt --filein $filein $args_mc
 
 
 ############# Scouting MC #############
 
-name=MC_2024_Scouting
+name=MC_2024_Scouting.py
 gt=auto:phase1_2024_realistic
 filein=/store/mc/RunIII2024Summer24MiniAODv6/GluGluHHto2B2Tau_Par-c2-0p00-kl-0p00-kt-1p00_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/PowhegBugFix_150X_mcRun3_2024_realistic_v2-v2/2520000/02adb734-559d-4c0e-997d-984f4ef0f62e.root #/store/mc/Run3Winter24MiniAOD/GluGlutoHHto2B2Tau_kl-0p00_kt-1p00_c2-0p00_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/133X_mcRun3_2024_realistic_v9-v3/2820000/a55161f6-8a99-47ed-a158-063e3726e97c.root
-cmsDriver.py $name $scouting_args_mc --fileout file:$name.root --conditions $gt --filein $filein  
+cmsDriver.py --python_file $name $scouting_args_mc --fileout file:$name.root --conditions $gt --filein $filein  
 
 ############# DATA #############
 
