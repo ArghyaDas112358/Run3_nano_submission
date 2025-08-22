@@ -244,7 +244,7 @@ def parse_args():
     parser.add_argument(
         "--scouting", default=False, action="store_true", help="Produce scouting samples"
     )
-    parser.add_argument("--campain", required=False, default="", type=str, help="Production campagn")
+    parser.add_argument("--campain", required=False, default="NanoAODv15Scouting24", type=str, help="Production campagn")
     args = parser.parse_args()
 
     if (args.user == ""): 
