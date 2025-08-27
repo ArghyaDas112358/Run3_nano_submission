@@ -66,9 +66,12 @@ class Sample:
 SAMPLES = {
     # sample name: Subsample(selector, # expected datasets)
     # !!! Adding the right number of expected datasets is a useful check! !!!
-    "HH4b": [Sample("GluGlutoHHto4B*", 4), Sample("VBFHHto4B*", 10)],
+    "HH4b": [Sample("GluGlu*HHto4B*", 4), Sample("VBFHHto4B*", 10)],
     # Not strict because of extra FS22 datasets in 2022
-    "HHbbtt": [Sample("GluGlutoHHto2B2Tau*", 4, strict=False), Sample("VBFHHto2B2Tau*", 10)],
+    "HH2b2tau": [
+        Sample("GluGlu*HHto2B2Tau*", 4, strict=False), 
+        Sample("VBF*HH*2B2Tau*", 10, strict=False)
+    ],
     "QCD-4Jets_HT": [Sample("QCD-4Jets_HT-*", 11)],
     # Not strict because of extra flat datasets in some years
     "QCD_PT": [Sample("QCD_PT-*", 16, strict=False)],
@@ -195,12 +198,14 @@ def get_mc(samples: list[str] = list(SAMPLES.keys()), year: str = "2024", tsg: b
             pre_len = len(tdict)
             print(f"\t{subsample.selector}")
             for tag in mc_tags[year]:
+                print(f"/{subsample.selector}/{tag}*/MINIAODSIM")
                 das_datasets = dbs.listDatasets(
                     dataset=f"/{subsample.selector}/{tag}*/MINIAODSIM", detail=1
                 )
                 # if sample in ["HH4b", "HHbbtt"]:
                 #     print_red(f"/{subsample}/{tag}*/MINIAODSIM")
                 #     pprint(das_datasets)
+                print(das_datasets)
                 for entry in das_datasets:
                     d = entry["dataset"]
                     if any(s in d for s in IGNORE_SELECTORS):
@@ -215,6 +220,7 @@ def get_mc(samples: list[str] = list(SAMPLES.keys()), year: str = "2024", tsg: b
                         tdict[dname] = [{d: entry}]
                     else:
                         tdict[dname].append({d: entry})
+                    #print(entry)
 
             # Checking number of datasets
             num_datasets = len(tdict) - pre_len
@@ -248,6 +254,7 @@ def get_mc(samples: list[str] = list(SAMPLES.keys()), year: str = "2024", tsg: b
 
         for dname, dlist in list(tdict.items()):
             if len(dlist) > 1:
+                print("More than 1 dataset!")
                 # Handling multiple datasets with the same primary_ds_name
 
                 # First remove any extra TSG datasets
@@ -261,6 +268,7 @@ def get_mc(samples: list[str] = list(SAMPLES.keys()), year: str = "2024", tsg: b
                         tdict[dname] = list(dlist[0].keys())[0]
                         continue
 
+                """
                 if (
                     year == "2024"
                     and "RunIII2024Summer24MiniAOD-140X" in str(list(dlist[0].keys())[0])
@@ -271,7 +279,8 @@ def get_mc(samples: list[str] = list(SAMPLES.keys()), year: str = "2024", tsg: b
                         f"\t{dname} has {len(dlist)} datasets, choosing the RunIII2024Summer24 one"
                     )
                     tdict[dname] = list(dlist[0].keys())[0]
-                elif any("ext1" in str(list(d.keys())[0]) for d in dlist):
+                """
+                if any("ext1" in str(list(d.keys())[0]) for d in dlist):
                     # This means there are ext1, ext2 etc. extra datasets, to which we add the _ext{idx} suffix
                     for d in dlist.copy():
                         if "_ext" in str(list(d.keys())[0]):
