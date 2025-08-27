@@ -38,7 +38,7 @@ mc_tags = {
     "2023BPix": ["Run3Summer23BPixMiniAODv4"],
     # 2024 summary slide: https://docs.google.com/presentation/d/1EHxQcWzw8IxPgCn8hm1prwSP-EktFtiuaEzH8WkQNVY/edit
     "2024": [
-        "RunIII2024Summer24MiniAODv6-150X",  # This is the recommended tag
+        "RunIII2024Summer24MiniAODv6",  # This is the recommended tag # RunIII2024Summer24MiniAODv6-150X
     ],
 }
 
