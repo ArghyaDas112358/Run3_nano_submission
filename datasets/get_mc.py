@@ -38,8 +38,7 @@ mc_tags = {
     "2023BPix": ["Run3Summer23BPixMiniAODv4"],
     # 2024 summary slide: https://docs.google.com/presentation/d/1EHxQcWzw8IxPgCn8hm1prwSP-EktFtiuaEzH8WkQNVY/edit
     "2024": [
-        "RunIII2024Summer24MiniAOD-140X",  # This is the recommended tag
-        "Run3Winter24MiniAOD-133X_mcRun3_2024_realistic",
+        "RunIII2024Summer24MiniAODv6-150X",  # This is the recommended tag
     ],
 }
 
