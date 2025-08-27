@@ -1,4 +1,28 @@
 #!/usr/bin/env python
+
+"""
+==================================================
+ Project/Script Name
+==================================================
+ Author:        Marc Huwiler
+ Created:       2025-08-18
+
+ Description:
+    Quick and dirty script to make json formatted dictionary entries
+    for dataset names from CMS DAS system. 
+
+ Usage:
+    python3 DAS2json.py QCDdatasets.txt -o QCDfilesall.json
+
+    dasgoclient --query="dataset=/QCD*/*RunIII2024Summer24MiniAODv6*/MINIAODSIM" | python3 DAS2json.py
+
+ Notes:
+    - Works both in Python 2 and Python 3
+    - Can be used in a bash pipe chain
+    
+==================================================
+"""
+
 from __future__ import division, print_function
 
 import os
