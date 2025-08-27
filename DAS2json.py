@@ -7,6 +7,26 @@ import json
 from argparse import ArgumentParser
 
 
+
+def DatasetDictFromFile(filename): 
+	result = ""
+
+	with open(os.path.expandvars(filename), "r") as infile:
+		for line in infile.readlines(): 
+			line = line.rstrip("\n") #line.replace("\n", "").replace("\r", "")
+			key = line.split("/")[1] # the dataset begins with a "/" so need the key after that
+			result += "\"{}\": \"{}\",\n".format(key, line)
+
+	return result
+
+def WriteDatasetDictToJson(result, filename): 
+	with open(filename, "w") as outfile: 
+			outfile.write("{")
+			outfile.write(result)
+			outfile.write("}")
+			#json.dump(results, outfile, ensure_ascii=False, sort_keys=False) #encoding="utf8", 
+
+
 if __name__ == "__main__":
 
 	parser = ArgumentParser(description="MergeLumis")
@@ -19,21 +39,12 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 
-	result = ""
-
-	with open(os.path.expandvars(args.file), "r") as infile:
-		for line in infile.readlines(): 
-			line = line.rstrip("\n") #line.replace("\n", "").replace("\r", "")
-			key = line.split("/")[1] # the dataset begins with a "/" so need the key after that
-			result += "\"{}\": \"{}\",\n".format(key, line)
+	result = DatasetDictFromFile(args.file)
 
 
 	if(args.show): print(result)
 
 	if (args.output != ""): 
-		with open(args.output, "w") as outfile: 
-			outfile.write("{")
-			outfile.write(result)
-			outfile.write("}")
-			#json.dump(results, outfile, ensure_ascii=False, sort_keys=False) #encoding="utf8", 
+		WriteDatasetDictToJson(result, args.output)
+			
 
