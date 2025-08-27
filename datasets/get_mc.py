@@ -72,9 +72,9 @@ SAMPLES = {
         Sample("GluGlu*HHto2B2Tau*", 4, strict=False), 
         Sample("VBF*HH*2B2Tau*", 10, strict=False)
     ],
-    "QCD-4Jets_HT": [Sample("QCD-4Jets_HT-*", 11)],
+    "QCD-4Jets_HT": [Sample("QCD-4Jets*HT*", 11)],
     # Not strict because of extra flat datasets in some years
-    "QCD_PT": [Sample("QCD_PT-*", 16, strict=False)],
+    "QCD_PT": [Sample("QCD*PT*", 16, strict=False)],
     "TT": [
         Sample("TTto2L2Nu_TuneCP5_13p6TeV*", 1),
         Sample("TTto4Q_TuneCP5_13p6TeV*", 1),
@@ -85,8 +85,8 @@ SAMPLES = {
         Sample("TbarWplustoLNu2Q_TuneCP5_13p6TeV*", 1),
         Sample("TWminusto4Q_TuneCP5_13p6TeV*", 1),
         Sample("TWminustoLNu2Q_TuneCP5_13p6TeV*", 1),
-        Sample("TbarBQ_t-channel_4FS*", 1),
-        Sample("TBbarQ_t-channel_4FS*", 1),
+        Sample("TbarBQ*_t-channel_4FS*", 1),
+        Sample("TBbarQ*_t-channel_4FS*", 1),
     ],
     "Hbb": [Sample("*Hto2B*M-125*", 14, strict=False)],  # random extra datasets in some years...
     "Hcc": [Sample("*Hto2C*M-125*", 14, strict=False)],  # random extra datasets in some years...
@@ -181,6 +181,8 @@ IGNORE_SELECTORS = [
     "/QCD_PT-15to7000_TuneCP5_Flat2022_13p6TeV_pythia8/Run3Winter24MiniAOD-133X_mcRun3_2024_realistic_v9-v2/MINIAODSIM",
     "/DYto2L-4Jets_MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/Run3Winter24MiniAOD-133X_mcRun3_2024_realistic_v9_ext2-v2/MINIAODSIM",
     "/WZ_TuneCP5_13p6TeV_pythia8/Run3Winter24MiniAOD-133X_mcRun3_2024_realistic_v7-v2/MINIAODSIM",
+    "TuneCP5Down", 
+    "TuneCP5Up"
 ]
 
 
