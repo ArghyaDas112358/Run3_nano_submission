@@ -15,8 +15,7 @@ def DatasetDictFromFile(filename):
 	with open(os.path.expandvars(filename), "r") as infile:
 		for line in infile.readlines(): 
 			line = line.rstrip("\n") #line.replace("\n", "").replace("\r", "")
-			key = line.split("/")[1] # the dataset begins with a "/" so need the key after that
-			result += "\"{}\": \"{}\",\n".format(key, line)
+			result += FormatLine(line)
 
 	return result
 
@@ -33,10 +32,14 @@ def FormatFromCmdInput(cmdinput):
 	print(cmdinput)
 	cmdinput = cmdinput.rstrip("\n")
 	for line in cmdinput.split("\n"): 
-			key = line.split("/")[1] # the dataset begins with a "/" so need the key after that
-			result += "\"{}\": \"{}\",\n".format(key, line)
-			print("\"{}\": \"{}\",\n".format(key, line))
+			result += FormatLine(line)
 
+	return result
+
+def FormatLine(line): 
+	key = line.split("/")[1] # the dataset begins with a "/" so need the key after that
+	result = "\"{}\": \"{}\",\n".format(key, line)
+	print(result)
 	return result
 
 
