@@ -66,9 +66,12 @@ class Sample:
 SAMPLES = {
     # sample name: Subsample(selector, # expected datasets)
     # !!! Adding the right number of expected datasets is a useful check! !!!
-    "HH4b": [Sample("GluGlutoHHto4B*", 4), Sample("VBFHHto4B*", 10)],
+    "HH4b": [Sample("GluGlu*HHto4B*", 4), Sample("VBFHHto4B*", 10)],
     # Not strict because of extra FS22 datasets in 2022
-    "HHbbtt": [Sample("GluGlutoHHto2B2Tau*", 4, strict=False), Sample("VBFHHto2B2Tau*", 10)],
+    "HH2b2tau": [
+        Sample("GluGlu*HHto2B2Tau*", 4, strict=False), 
+        Sample("VBF*HH*2B2Tau*", 10, strict=False)
+    ],
     "QCD-4Jets_HT": [Sample("QCD-4Jets_HT-*", 11)],
     # Not strict because of extra flat datasets in some years
     "QCD_PT": [Sample("QCD_PT-*", 16, strict=False)],
