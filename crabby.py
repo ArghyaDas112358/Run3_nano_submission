@@ -284,8 +284,8 @@ def main(args):
         "name": f"{dlabel}_{args.year}_{args.dataset}",
         "crab_template": "template_crab.py",
         "workArea": f"crab/{TAG}/{dlabel}_{args.year}_{args.dataset}",
-        "storageSite": "T2_CH_CSCS",
-        "outLFNDirBase": f"/store/user/{args.user}/production/Scouting/{args.campain}/{dlabel}_{args.year}",
+        "storageSite": "T3_US_FNALLPC", #T2_CH_CSCS
+        "outLFNDirBase": f"/store/group/lpcpfnano/PFNano_Run3/{args.campain}/{args.user}/{dlabel}_{args.year}", #/store/user/{args.user}/production/Scouting/{args.campain}/{dlabel}_{args.year}
         "voGroup": None,
         "publication": True,
         "config": f"configs/{CONFIGS[dlabel][args.year]}",
