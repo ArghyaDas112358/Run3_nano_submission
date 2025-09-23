@@ -18,7 +18,7 @@ args_mc="$base_args $mc_args"
 args_data="$base_args $data_args"
 
 #base_args_scouting="--no_exec -n $NEVENTS --nThreads $NTHREADS --era $ERA" #--customise DAZSLE/DAZSLE/customize.customize --scenario pp  --customise_commands=\"process.add_(cms.Service('InitRootHandlers',EnableIMT=cms.untracked.bool(False)));process.MessageLogger.cerr.FwkReport.reportEvery=1000\"
-scouting_args="-s NANO:@GENFromMini+@Scout --process NANO -n $NEVENTS --nThreads $NTHREADS --era $ERA  --customise_commands=\"process.NANOAODSIMoutput.outputCommands.append(`keep edmTriggerResults_*_*_*`)\" --no_exec"
+scouting_args="-s NANO:@GENFromMini+@Scout --process NANO -n $NEVENTS --nThreads $NTHREADS --era $ERA --customise PhysicsTools/NanoAOD/custom_run3scouting_cff.addScoutingPFCandidate --customise_commands=\"process.NANOAODSIMoutput.outputCommands.append(`keep edmTriggerResults_*_*_*`)\" --no_exec"
 scouting_args_mc="$scouting_args $mc_args" #$base_args_scouting 
 
 echo $args_mc
