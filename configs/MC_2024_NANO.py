@@ -2,12 +2,12 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: MC_2024 --fileout file:MC_2024.root --conditions 140X_mcRun3_2024_realistic_v26 --filein /store/mc/RunIII2024Summer24MiniAOD/QCD-4Jets_Bin-HT-1000to1200_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/100000/00f7403b-49bf-4efd-9b8f-0398bd61d910.root --customise DAZSLE/DAZSLE/customize.customize --step NANO:@BTV --scenario pp --customise_commands="process.add_(cms.Service('InitRootHandlers',EnableIMT=cms.untracked.bool(False)));process.MessageLogger.cerr.FwkReport.reportEvery=1000" --no_exec -n 10 --nThreads 4 --era Run3 --eventcontent NANOAODSIM --datatier NANOAODSIM --mc
+# with command line options: MC_2024 --fileout file:MC_2024.root --conditions 140X_mcRun3_2024_realistic_v26 --filein /store/mc/RunIII2024Summer24MiniAOD/QCD-4Jets_Bin-HT-1000to1200_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/100000/00f7403b-49bf-4efd-9b8f-0398bd61d910.root --customise DAZSLE/DAZSLE/customize.customize --step NANO:@BTV --scenario pp --customise_commands process.add_(cms.Service('InitRootHandlers',EnableIMT=cms.untracked.bool(False)));process.MessageLogger.cerr.FwkReport.reportEvery=1000 --no_exec -n 10 --nThreads 4 --era Run3_2024 --eventcontent NANOAODSIM --datatier NANOAODSIM --mc
 import FWCore.ParameterSet.Config as cms
 
-from Configuration.Eras.Era_Run3_cff import Run3
+from Configuration.Eras.Era_Run3_2024_cff import Run3_2024
 
-process = cms.Process('NANO',Run3)
+process = cms.Process('NANO',Run3_2024)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -112,24 +112,26 @@ from DAZSLE.DAZSLE.customize import customize
 #call to customisation function customize imported from DAZSLE.DAZSLE.customize
 process = customize(process)
 
-# Automatic addition of the customisation function from PhysicsTools.NanoAOD.custom_btv_cff
-from PhysicsTools.NanoAOD.custom_btv_cff import BTVCustomNanoAOD_AK8 
-
-#call to customisation function BTVCustomNanoAOD_AK8 imported from PhysicsTools.NanoAOD.custom_btv_cff
-process = BTVCustomNanoAOD_AK8(process)
-
 # Automatic addition of the customisation function from PhysicsTools.NanoAOD.nano_cff
 from PhysicsTools.NanoAOD.nano_cff import nanoAOD_customizeCommon 
 
 #call to customisation function nanoAOD_customizeCommon imported from PhysicsTools.NanoAOD.nano_cff
 process = nanoAOD_customizeCommon(process)
 
+# Automatic addition of the customisation function from PhysicsTools.NanoAOD.custom_btv_cff
+from PhysicsTools.NanoAOD.custom_btv_cff import BTVCustomNanoAOD 
+
+#call to customisation function BTVCustomNanoAOD imported from PhysicsTools.NanoAOD.custom_btv_cff
+process = BTVCustomNanoAOD(process)
+
 # End of customisation functions
 
 
 # Customisation from command line
 
-"process.add_(cms.Service('InitRootHandlers',EnableIMT=cms.untracked.bool(False)));process.MessageLogger.cerr.FwkReport.reportEvery=1000"
+process.add_(cms.Service('InitRootHandlers',EnableIMT=cms.untracked.bool(False)));process.MessageLogger.cerr.FwkReport.reportEvery=1000 
+process.source.delayReadingEventProducts = cms.untracked.bool(False)
+
 # Add early deletion of temporary data products to reduce peak memory need
 from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete
 process = customiseEarlyDelete(process)

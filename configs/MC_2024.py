@@ -2,12 +2,12 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: MC_postEE2022 --fileout file:MC_postEE2022.root --conditions 140X_mcRun3_2022_realistic_v12 --filein /store/mc/Run3Summer22EEMiniAODv4/VBFHHto2B2Tau_CV_1_C2V_0_C3_1_TuneCP5_13p6TeV_madgraph-pythia8/MINIAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2520000/64400fec-6979-4a7e-8737-2c4219ecb1be.root --customise DAZSLE/DAZSLE/customize.customize --step NANO:@BTV --scenario pp --customise_commands process.add_(cms.Service('InitRootHandlers',EnableIMT=cms.untracked.bool(False)));process.MessageLogger.cerr.FwkReport.reportEvery=1000 --no_exec -n 10 --nThreads 4 --era Run3_2024 --eventcontent NANOAODSIM --datatier NANOAODSIM --mc
+# with command line options: MC_2024 --fileout file:MC_2024.root --conditions 140X_mcRun3_2024_realistic_v26 --filein /store/mc/RunIII2024Summer24MiniAOD/QCD-4Jets_Bin-HT-1000to1200_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/100000/00f7403b-49bf-4efd-9b8f-0398bd61d910.root --customise DAZSLE/DAZSLE/customize.customize --step NANO:@BTV --scenario pp --customise_commands="process.add_(cms.Service('InitRootHandlers',EnableIMT=cms.untracked.bool(False)));process.MessageLogger.cerr.FwkReport.reportEvery=1000" --no_exec -n 10 --nThreads 4 --era Run3 --eventcontent NANOAODSIM --datatier NANOAODSIM --mc --python_file MC_2024.py
 import FWCore.ParameterSet.Config as cms
 
-from Configuration.Eras.Era_Run3_2024_cff import Run3_2024
+from Configuration.Eras.Era_Run3_cff import Run3
 
-process = cms.Process('NANO',Run3_2024)
+process = cms.Process('NANO',Run3)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -28,7 +28,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('/store/mc/Run3Summer22EEMiniAODv4/VBFHHto2B2Tau_CV_1_C2V_0_C3_1_TuneCP5_13p6TeV_madgraph-pythia8/MINIAODSIM/130X_mcRun3_2022_realistic_postEE_v6-v2/2520000/64400fec-6979-4a7e-8737-2c4219ecb1be.root'),
+    fileNames = cms.untracked.vstring('/store/mc/RunIII2024Summer24MiniAOD/QCD-4Jets_Bin-HT-1000to1200_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/100000/00f7403b-49bf-4efd-9b8f-0398bd61d910.root'),
     secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -66,7 +66,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('MC_postEE2022 nevts:10'),
+    annotation = cms.untracked.string('MC_2024 nevts:10'),
     name = cms.untracked.string('Applications'),
     version = cms.untracked.string('$Revision: 1.19 $')
 )
@@ -80,7 +80,7 @@ process.NANOAODSIMoutput = cms.OutputModule("NanoAODOutputModule",
         dataTier = cms.untracked.string('NANOAODSIM'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:MC_postEE2022.root'),
+    fileName = cms.untracked.string('file:MC_2024.root'),
     outputCommands = process.NANOAODSIMEventContent.outputCommands
 )
 
@@ -88,7 +88,7 @@ process.NANOAODSIMoutput = cms.OutputModule("NanoAODOutputModule",
 
 # Other statements
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '140X_mcRun3_2022_realistic_v12', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '140X_mcRun3_2024_realistic_v26', '')
 
 # Path and EndPath definitions
 process.nanoAOD_step = cms.Path(process.nanoSequenceMC)
@@ -129,9 +129,8 @@ process = BTVCustomNanoAOD(process)
 
 # Customisation from command line
 
-process.add_(cms.Service('InitRootHandlers',EnableIMT=cms.untracked.bool(False)));process.MessageLogger.cerr.FwkReport.reportEvery=1000 
+"process.add_(cms.Service('InitRootHandlers',EnableIMT=cms.untracked.bool(False)));process.MessageLogger.cerr.FwkReport.reportEvery=1000"
 process.source.delayReadingEventProducts = cms.untracked.bool(False)
-
 # Add early deletion of temporary data products to reduce peak memory need
 from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete
 process = customiseEarlyDelete(process)
