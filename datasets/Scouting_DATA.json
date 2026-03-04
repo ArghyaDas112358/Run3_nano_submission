@@ -1,0 +1,23 @@
+{
+  "2022": {
+    "Run2022C": "/ScoutingPFRun3/Run2022C-ScoutNano-v1/NANOAOD",
+    "Run2022D": "/ScoutingPFRun3/Run2022D-ScoutNano-v1/NANOAOD",
+    "Run2022E": "/ScoutingPFRun3/Run2022E-ScoutNano-v1/NANOAOD",
+    "Run2022F": "/ScoutingPFRun3/Run2022F-ScoutNano-v1/NANOAOD",
+    "Run2022G": "/ScoutingPFRun3/Run2022G-ScoutNano-v1/NANOAOD"
+  },
+  "2023": {
+    "Run2023C": "/ScoutingPFRun3/Run2023C-ScoutNano-v1/NANOAOD",
+    "Run2023D": "/ScoutingPFRun3/Run2023D-ScoutNano-v1/NANOAOD"
+  },
+  "2024": {
+    "Run2024C": "/ScoutingPFRun3/Run2024C-ScoutNano-v1/NANOAOD",
+    "Run2024D": "/ScoutingPFRun3/Run2024D-ScoutNano-v1/NANOAOD",
+    "Run2024E": "/ScoutingPFRun3/Run2024E-ScoutNano-v1/NANOAOD",
+    "Run2024F": "/ScoutingPFRun3/Run2024F-ScoutNano-v1/NANOAOD",
+    "Run2024G": "/ScoutingPFRun3/Run2024G-ScoutNano-v1/NANOAOD",
+    "Run2024H": "/ScoutingPFRun3/Run2024H-ScoutNano-v1/NANOAOD",
+    "Run2024I": "/ScoutingPFRun3/Run2024I-ScoutNano-v1/NANOAOD",
+    "Run2024J": "/ScoutingPFRun3/Run2024J-ScoutNano-v1/NANOAOD"
+  }
+}

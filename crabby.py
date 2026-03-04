@@ -284,7 +284,7 @@ def main(args):
         "name": f"{dlabel}_{args.year}_{args.dataset}",
         "crab_template": "template_crab.py",
         "workArea": f"crab/{TAG}/{dlabel}_{args.year}_{args.dataset}",
-        "storageSite": "T2_CH_CSCS",
+        "storageSite": "T2_US_Purdue",
         "outLFNDirBase": f"/store/user/{args.user}/production/Scouting/{args.campain}/{dlabel}_{args.year}",
         "voGroup": None,
         "publication": True,
