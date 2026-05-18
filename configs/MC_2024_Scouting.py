@@ -120,6 +120,10 @@ process = customiseScoutingNano(process)
 #call to customisation function customiseScoutingNanoFromMini imported from PhysicsTools.NanoAOD.custom_run3scouting_cff
 process = customiseScoutingNanoFromMini(process)
 
+# Add ScoutingTranslator customisation (UParT AK4 tagger, GloParT AK8, reclustered jets)
+from PhysicsTools.ScoutingTranslator.ScoutingNanoCustomisation_cff import addAll
+process = addAll(process)
+
 # Automatic addition of the customisation function from PhysicsTools.NanoAOD.nanogen_cff
 from PhysicsTools.NanoAOD.nanogen_cff import customizeNanoGENFromMini 
 
