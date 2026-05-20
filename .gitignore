@@ -181,3 +181,6 @@ CrabStatus.csv
 
 # testing
 test.ipynb
+
+# Local Claude Code settings (machine-specific overrides; team defaults are in .claude/settings.json)
+.claude/settings.local.json

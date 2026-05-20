@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(voms-proxy-info:*)",
+      "Bash(voms-proxy-init:*)",
+      "Bash(source /cvmfs/cms.cern.ch/cmsset_default.sh)",
+      "Bash(source /cvmfs/cms.cern.ch/common/crab-setup.sh)",
+      "Bash(cmsenv)",
+      "Bash(crab status:*)",
+      "Bash(crab checkwrite:*)",
+      "Bash(crab getlog:*)",
+      "Bash(python3 crab_status.py:*)",
+      "Bash(python3 datasets/get_mc.py:*)",
+      "Bash(python3 datasets/get_datasets.py:*)",
+      "Bash(python3 download_data.py:*)",
+      "Bash(python3 download_scouting_data.py:*)",
+      "Bash(dasgoclient:*)",
+      "Bash(ls:*)",
+      "Bash(find . -type f:*)",
+      "Bash(find . -name:*)",
+      "Bash(cat datasets/:*)",
+      "Bash(cat configs/:*)",
+      "Bash(cat .env.example)",
+      "Bash(cat CLAUDE.md)",
+      "Bash(python3 -m json.tool:*)",
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git branch:*)"
+    ]
+  }
+}
