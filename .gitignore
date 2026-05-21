@@ -179,6 +179,11 @@ CMSSW*
 *.root
 CrabStatus.csv
 
+# operational one-offs (per-user paths, not for showcase)
+bootstrap_myproxy.sh
+monitor_diboson_vjetslo.sh
+datasets/MC_*\ copy.json
+
 # testing
 test.ipynb
 

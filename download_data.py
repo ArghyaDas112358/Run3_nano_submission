@@ -20,7 +20,9 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Download NanoAOD data via XRootD")
     parser.add_argument("--year", required=True, type=str, choices=["2022", "2022EE", "2023", "2023BPix", "2024"], help="Year of the dataset")
     parser.add_argument("--dataset", required=True, type=str, help="Dataset name (e.g., JetMET, Muon, EGamma)")
-    parser.add_argument("--user", required=False, default="arghyara", type=str, help="Username for EOS path")
+    parser.add_argument("--user", default=os.environ.get("CERN_USER"),
+                        required=os.environ.get("CERN_USER") is None,
+                        type=str, help="Username for EOS path (defaults to $CERN_USER from .env)")
     parser.add_argument("--campaign", required=False, default="NanoAODv15Scouting24", type=str, help="Campaign name")
     return parser.parse_args()
 

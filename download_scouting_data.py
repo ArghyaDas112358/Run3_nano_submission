@@ -21,7 +21,9 @@ except ImportError:
 def parse_args():
     parser = argparse.ArgumentParser(description="Download Scouting NanoAOD data via XRootD")
     parser.add_argument("--year", required=True, type=str, choices=["2022", "2023", "2024"], help="Year of the dataset")
-    parser.add_argument("--user", required=False, default="das214", type=str, help="Username for EOS path")
+    parser.add_argument("--user", default=os.environ.get("PURDUE_USER"),
+                        required=os.environ.get("PURDUE_USER") is None,
+                        type=str, help="Username for EOS path (defaults to $PURDUE_USER from .env)")
     parser.add_argument("--campaign", required=False, default="NanoAODv15Scouting24", type=str, help="Campaign name")
     parser.add_argument("--threads", required=False, default=12, type=int, help="Number of parallel downloads")
     return parser.parse_args()
