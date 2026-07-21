@@ -1,0 +1,6 @@
+campaign:
+  # Purdue Tier-2 (default storage when no card is passed; this file
+  # exists so the workflow `crabby.py ... --card cards/purdue.yaml` is
+  # always valid even when running from the Purdue Analysis Facility).
+  storageSite: T2_US_Purdue
+  voGroup: null

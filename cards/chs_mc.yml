@@ -1,0 +1,6 @@
+# CHS-campaign MC card (NanoAODv17ScoutingCHS24) — PORTABLE.
+# ${CMSSW_AREA} comes from your .env (source it first: `set -a; source .env; set +a`).
+# Same card for every MC group; pick the group with `--dataset <GROUP>`.
+campaign:
+  config: ${CMSSW_AREA}/src/ScoutingNanoProduction/scoutingnano_mc_hhbbtt.py
+  tag_extension: HHBBTT_CHSUParT

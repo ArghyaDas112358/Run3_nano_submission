@@ -282,17 +282,6 @@ class TestMakeSubstitution:
         content = _read_generated(base_card, ds)
         assert ds in content
 
-    @pytest.mark.xfail(
-        reason=(
-            "real bug: template_crab.py wraps _publication_ in quotes "
-            "(`config.Data.publication = \"_publication_\"`) so after substitution "
-            "the value is the STRING 'False', not the literal False. In Python any "
-            "non-empty string is truthy -> CRAB would still publish in --test True "
-            "mode. Either the template should drop the quotes around _publication_, "
-            "or crabby should emit unquoted booleans. See template_crab.py L22."
-        ),
-        strict=True,
-    )
     def test_test_mode_sets_total_units_and_publication_false(
         self, base_card: dict[str, Any], template_crab_text: str
     ) -> None:
@@ -303,21 +292,18 @@ class TestMakeSubstitution:
         assert "config.Data.totalUnits = 1" in content, (
             "test=True must inject totalUnits = 1"
         )
-        # We *want* this to be the Python literal False, but it's currently the
-        # string "False" -- see xfail reason.
+        # Bare Python bool literal (not a quoted string).  Fixed in template_crab.py.
         assert "config.Data.publication = False" in content
         assert "config.Data.publication = True" not in content
 
-    def test_test_mode_injects_total_units_documented_behaviour(
+    def test_test_mode_injects_total_units(
         self, base_card: dict[str, Any], template_crab_text: str
     ) -> None:
-        """Companion to the xfail above: lock down the part that DOES work."""
+        """Lock down totalUnits injection independently of publication."""
         ds = "/A/B-v1/MINIAODSIM"
         crabby.make(base_card, [ds], template_crab_text, test=True)
         content = _read_generated(base_card, ds)
         assert "config.Data.totalUnits = 1" in content
-        # Document the current (buggy) string-quoted behaviour so any change is loud:
-        assert 'config.Data.publication = "False"' in content
 
     def test_data_mode_sets_units_per_job_and_runtime(
         self, base_card_data: dict[str, Any], template_crab_text: str
@@ -344,15 +330,6 @@ class TestMakeSubstitution:
         assert "lumiMask" not in content
         assert "maxJobRuntimeMin" not in content
 
-    @pytest.mark.xfail(
-        reason=(
-            "real bug: see test_test_mode_sets_total_units_and_publication_false. "
-            "_publication_ is quoted in template_crab.py, so test mode injects "
-            "the string 'False' instead of the literal False -- CRAB sees a "
-            "truthy string and publishes anyway."
-        ),
-        strict=True,
-    )
     def test_test_mode_overrides_publication_even_if_card_says_true(
         self, base_card: dict[str, Any], template_crab_text: str
     ) -> None:

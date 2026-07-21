@@ -58,9 +58,15 @@ def main(args):
     for year in args.years:
         for sample in args.samples:
             isData = sample in DATASETS
-            datamc_label = "data" if isData else "mc"
+            if args.scouting:
+                datamc_label = "datascouting" if isData else "mcscouting"
+            else:
+                datamc_label = "data" if isData else "mc"
             dir_name = f"{datamc_label}_{year}_{sample}"
-            dir_path = Path("crab") / dir_name
+            if args.campaign:
+                dir_path = Path("crab") / args.campaign / dir_name
+            else:
+                dir_path = Path("crab") / dir_name
 
             print("Checking", dir_name)
             if not dir_path.exists():
@@ -76,14 +82,18 @@ def main(args):
                 print(f"\t\tJob status: {jobs_status}")
                 # print(f"\t\tOutput dataset: {output_dataset}")
 
+                # Strip "crab_" prefix; keep the rest (request name) — truncated
+                # names already include an 8-char random suffix from crabby's rnd_str,
+                # so we can't safely strip a tail.
+                subsample = re.sub(r"^crab_", "", directory.name)
                 datasets.append(dir_name)
-                subsamples.append(directory.name[5:-8]) # remove "crab_" and "_MINIAOD"
+                subsamples.append(subsample)
                 job_status.append(float(jobs_status))
 
                 # Append the information to the consolidated CSV file
                 with open(csv_file, "a", newline="") as csvfile:
                     csv_writer = csv.writer(csvfile)
-                    csv_writer.writerow([directory.name[5:-8], jobs_status, output_dataset])
+                    csv_writer.writerow([dir_name, subsample, jobs_status, output_dataset])
 
             # plotter(dir_name, job_status, filename=plot_dir / f"{dir_name}.pdf")
 
@@ -165,6 +175,17 @@ if __name__ == "__main__":
         required=True,
         choices=list(SAMPLES.keys()) + list(DATASETS.keys()),
         help="List of samples to check, e.g. JetMET, HH4b",
+    )
+    parser.add_argument(
+        "--campaign",
+        type=str,
+        default=os.environ.get("CAMPAIGN", ""),
+        help="Campaign tag subdir under crab/ (defaults to $CAMPAIGN env var; empty = legacy crab/<sample>/ layout)",
+    )
+    parser.add_argument(
+        "--scouting",
+        action="store_true",
+        help="Use scouting work areas (crab/<CAMPAIGN>/mcscouting_<year>_<sample>/)",
     )
     args = parser.parse_args()
 

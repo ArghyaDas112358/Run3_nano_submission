@@ -1,0 +1,5 @@
+campaign:
+  # CERN Tier-2.  Pair with --user "$CERN_USER" on the CLI so
+  # outLFNDirBase resolves to /store/user/<CERN_USER>/... on EOS.
+  storageSite: T2_CH_CERN
+  voGroup: null

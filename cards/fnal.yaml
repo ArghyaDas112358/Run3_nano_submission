@@ -1,0 +1,5 @@
+campaign:
+  # FNAL LPC.  Pair with --user "$FNAL_USER" on the CLI so
+  # outLFNDirBase resolves to /store/user/<FNAL_USER>/... at the LPC.
+  storageSite: T3_US_FNALLPC
+  voGroup: null

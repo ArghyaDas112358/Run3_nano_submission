@@ -105,15 +105,18 @@ SAMPLES = {
         # temporarily while waiting for [0-2]J datasets
         Sample("DYto2L-2Jets_MLL-50_TuneCP5_13p6TeV*", 11, strict=False, years=YEARS_2024),
     ],
+    # NOTE: 2024 datasets use a `_Bin-` infix (e.g. `Wto2Q-3Jets_Bin-HT-…`)
+    # that 2022/2023 do not.  All selectors below use `*HT*`/`*PT*`/`*PTQQ*`
+    # wildcards so they match both naming conventions.
     "VJetsLO": [
-        Sample("Wto2Q-3Jets_HT*", 4),
+        Sample("Wto2Q-3Jets*HT*", 4, strict=False),
         Sample("WtoLNu-4Jets_*J*", 4),
-        Sample("Zto2Q-4Jets_HT*", 4),
+        Sample("Zto2Q-4Jets*HT*", 4, strict=False),
     ],
     "VJetsNLO": [
-        Sample("Wto2Q-2Jets_PT*", 8),
-        Sample("WtoLNu-2Jets_*J*", 3),
-        Sample("Zto2Q-2Jets_PTQQ*", 8),
+        Sample("Wto2Q-2Jets*PT*", 8, strict=False),
+        Sample("WtoLNu-2Jets_*J*", 3, strict=False, strictgt=False),
+        Sample("Zto2Q-2Jets*PTQQ*", 8, strict=False),
     ],
     "Diboson": [
         Sample("WW_TuneCP5*", 1),
@@ -145,10 +148,10 @@ SAMPLES = {
         Sample("VBFtoLNu*", 1),
     ],
     "VGamma": [
-        Sample("WGtoLNuG-1Jets_PTG-*", 5),
-        Sample("WGto2QG-1Jets_PTG-*", 2, strict=False),  # Extra PTG-10 dataset in 2023
-        Sample("ZGto2NuG-1Jets_PTG-*", 5),
-        Sample("ZGto2QG-1Jets_PTG-*", 2, strict=False),  # Extra PTG-10 dataset in 2023
+        Sample("WGtoLNuG-1Jets*PTG-*", 5, strict=False),
+        Sample("WGto2QG-1Jets*PTG-*", 2, strict=False),  # Extra PTG-10 dataset in 2023
+        Sample("ZGto2NuG-1Jets*PTG-*", 5, strict=False),
+        Sample("ZGto2QG-1Jets*PTG-*", 2, strict=False),  # Extra PTG-10 dataset in 2023
     ],
 }
 

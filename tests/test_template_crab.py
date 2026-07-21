@@ -262,26 +262,16 @@ def test_data_mode_appends_units_and_runtime_lines():
 # ---------------------------------------------------------------------------
 # 4) _publication_ replacement semantics
 # ---------------------------------------------------------------------------
-def test_publication_renders_as_quoted_string_documents_current_bug():
-    """REAL BUG, documented (not fixed) by this test:
+def test_publication_renders_as_bare_bool_literal():
+    """template_crab.py line 22 now reads:
 
-    template_crab.py line 22 reads:
-        config.Data.publication = "_publication_"
-    -- the placeholder is *inside* quotes -- and crabby.make() replaces
-    ``_publication_`` with the raw token ``False`` / ``True``.  The
-    rendered line is therefore::
+        config.Data.publication = _publication_   # no surrounding quotes
 
-        config.Data.publication = "False"   # a *non-empty string*, truthy!
-
-    CRAB's Python config DSL expects ``config.Data.publication`` to be a
-    bool; non-empty strings are truthy, so ``--test True`` does not
-    actually suppress publication.
-
-    The fix is to remove the surrounding quotes in template_crab.py.
-
-    This test asserts the *correct* behaviour and is marked xfail(strict)
-    so that, when the template is fixed, it becomes an XPASS and forces
-    removal of the xfail marker.
+    so crabby.make() substitutes the raw token ``False`` / ``True`` and
+    the rendered line is a bare Python bool literal.  This is what CRAB's
+    Python config DSL expects -- quoting the placeholder used to silently
+    break ``--test True`` (non-empty strings are truthy, so CRAB
+    published anyway).
     """
     card_info = dict(DUMMY_CARD_INFO_STR)
     card_info["_publication_"] = "False"
@@ -292,31 +282,6 @@ def test_publication_renders_as_quoted_string_documents_current_bug():
         f"{[ln for ln in rendered.splitlines() if 'publication' in ln]}"
     )
     assert 'config.Data.publication = "False"' not in rendered
-
-
-# Pin the xfail marker on the bug-documenting test only.
-test_publication_renders_as_quoted_string_documents_current_bug = pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "template_crab.py wraps _publication_ in quotes, so make() yields "
-        '\'config.Data.publication = "False"\' (truthy string) instead of a '
-        "bare bool.  Remove the surrounding quotes on template_crab.py line 22 "
-        "to fix."
-    ),
-)(test_publication_renders_as_quoted_string_documents_current_bug)
-
-
-def test_publication_current_buggy_behaviour_is_quoted_string():
-    """Lock down the *current* (buggy) behaviour so silent further drift
-    is caught.  Pair this with the xfail test above: when the template is
-    fixed, this test starts failing AND the xfail test starts XPASSing --
-    both signals to the developer that the contract changed."""
-    card_info = dict(DUMMY_CARD_INFO_STR)
-    card_info["_publication_"] = "False"
-    rendered = _render_template(card_info)
-    assert 'config.Data.publication = "False"' in rendered, (
-        "Current behaviour expected: publication rendered as quoted string."
-    )
 
 
 def test_crabby_make_passes_string_False_under_test_flag():

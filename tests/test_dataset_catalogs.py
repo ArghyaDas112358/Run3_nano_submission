@@ -195,18 +195,6 @@ class TestCrabbyFilterIsNonEmpty:
 # =============================================================================
 # 7. DATA catalogs use crabby.DATASETS keys (sanity / detection of typos)
 # =============================================================================
-@pytest.mark.xfail(
-    reason=(
-        "real bug: every DATA_*.json contains 'ParkingSingleMuon' and "
-        "'ParkingVBF' categories, but crabby.DATASETS = ['JetMET','EGamma',"
-        "'Muon','MuonEG','BTagMu','Tau'] does NOT list them. Calling "
-        "`crabby.py --dataset ParkingVBF` routes through `isData = False` "
-        "(parking key not in DATASETS), reads from MC_*.json which doesn't "
-        "have that key, and KeyErrors. Either add the parking streams to "
-        "crabby.DATASETS or drop them from the JSON."
-    ),
-    strict=True,
-)
 def test_data_catalogs_keys_subset_of_DATASETS(datasets_dir: Path) -> None:
     """
     Every top-level key in DATA_*.json (except Scouting_DATA, which is

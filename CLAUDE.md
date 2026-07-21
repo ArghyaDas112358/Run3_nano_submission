@@ -3,7 +3,7 @@
 CMS scouting NanoAOD production for HH→bbττ. Submits CRAB jobs that read MiniAOD (or `ScoutingPFRun3` ScoutNano) and write reclustered scouting AK4/AK8 jets with UParT + HLT ParticleNet tagger scores.
 
 - **Upstream remote:** `github.com/ArghyaRanjanDas/Run3_nano_submission`
-- **Site branches:** `NanoAODv15_151_Scouting_PAF`, `NanoAODv15_151_Scouting_FNAL`, `NanoAODv15_151_Scouting`
+- **Active campaign branch:** `NanoAODv17_CHS` (CHS recipe, campaign `NanoAODv17ScoutingCHS24`) — see `RUNBOOK_CHS.md` for the submitter quick path + `ASSIGNMENTS.md` for who owns which group. Legacy v15 site branches (`NanoAODv15_151_Scouting_*`) are history.
 - **Design docs:** `des/` — architecture, data flow, tagger map, dataset catalog, CRAB workflow
 
 > **Never hardcode usernames or absolute home paths in any file in this repo.** Per-user values live in `.env` (gitignored). The committed template is `.env.example`.
@@ -12,24 +12,15 @@ CMS scouting NanoAOD production for HH→bbττ. Submits CRAB jobs that read Min
 
 ## First-time setup (new collaborator)
 
-1. **Clone and check out your site's branch:**
+1. **Clone the campaign branch:**
    ```bash
-   git clone https://github.com/ArghyaRanjanDas/Run3_nano_submission
+   git clone -b NanoAODv17_CHS https://github.com/ArghyaRanjanDas/Run3_nano_submission
    cd Run3_nano_submission
-   git checkout NanoAODv15_151_Scouting_PAF   # or _FNAL, or _Scouting
    ```
 
-2. **Build CMSSW** (one-time, ~10–20 min):
+2. **Build CMSSW** (one-time, ~15–25 min; needs `git config --global user.github <you>`):
    ```bash
-   ./setup.sh
-   ```
-   Then install the scouting-specific externals — see `des/architecture/cmssw_integration.md`. Outline:
-   ```bash
-   cd cmssw/$CMSSW_VERSION/src
-   git clone https://github.com/ArghyaRanjanDas/ScoutingTranslator PhysicsTools/ScoutingTranslator
-   # Copy RecoBTag/{ONNXRuntime,FeatureTools} and UParT ONNX models per des/ doc
-   scram b -j8
-   cd -
+   ./setup.sh    # CMSSW_16_1_0_pre4 + JanFSchulte:derivedScouting + the HHbbtt pset fork
    ```
 
 3. **Configure your environment:**
@@ -68,21 +59,21 @@ voms-proxy-info --timeleft                # must be > 0
 ```bash
 python3 crabby.py --year <YEAR> --dataset <CATEGORY> \
                   [--scouting] [--make] [--submit] [--status] [--test True] \
-                  [--user "$PURDUE_USER"] [--card cards/X.yaml] [--campain "$CAMPAIGN"]
+                  [--user "$PURDUE_USER"] [--card cards/X.yaml] [--campaign "$CAMPAIGN"]
 ```
 
 | Flag | Meaning |
 |---|---|
 | `--year` | `2022`, `2022EE`, `2023`, `2023BPix`, `2024` (required) |
 | `--dataset` | Category key from `datasets/<MC\|DATA>_<year>.json` (required) |
-| `--scouting` | Use the scouting cmsRun config (`configs/MC_2024_Scouting.py` for 2024) |
+| `--scouting` | Use the scouting cmsRun config (`configs/MC_2024_Scouting.py` for 2024). **Only 2024 has a dedicated scouting pset** — for 2022/2022EE/2023/2023BPix the flag falls back to the standard `MC_*_NANO.py` config and crabby prints a warning. |
 | `--make` | Generate per-sample CRAB configs in `crab/<TAG>/<dlabel>_<year>_<dataset>/` |
 | `--submit` | Submit configs created by `--make`. **Irreversible** — publishes to DBS `phys03`. |
 | `--status` | Query CRAB status; writes `outputs_<card>.txt` |
 | `--test True` | Dry run: 1 unit, publication off |
 | `--user` | Grid username (default `$USER`; pass `"$PURDUE_USER"` for portability) |
 | `--card` | YAML override (e.g. site-specific `storageSite`) |
-| `--campain` | TAG used in `workArea` + LFN path |
+| `--campaign` | TAG used in `workArea` + LFN path. (The legacy alias `--campain` still works but prints a deprecation warning.) |
 
 ### 2024 MC categories (`datasets/MC_2024.json`)
 `HHbbtt`, `HH4b`, `HH2b2tau`, `TT`, `SingleTop`, `Hbb`, `Hcc`, `Htautau`, `DYJetsLO`, `DYJetsNLO`, `VJetsLO`, `VJetsNLO`, `Diboson`, `EWKV`, `VGamma`, `QCD-4Jets_HT`, `QCD_PT`.
@@ -117,19 +108,27 @@ python3 crabby.py --year 2024 --dataset HHbbtt --scouting --card cards/fnal.yaml
 ## Monitoring & resubmission
 
 ```bash
-# Aggregate status → CrabStatus.csv
-python3 crab_status.py --years 2024 --samples HHbbtt TT DYJetsNLO
+# Aggregate status → CrabStatus.csv (scouting MC needs --campaign + --scouting
+# so it picks up crab/<CAMPAIGN>/mcscouting_<year>_<sample>/ work areas)
+python3 crab_status.py --campaign "$CAMPAIGN" --scouting \
+                       --years 2024 --samples HHbbtt TT DYJetsNLO
 
-# Or via crabby
+# Or via crabby (per-group, prints job-state lines + writes outputs_<name>.txt)
 python3 crabby.py --year 2024 --dataset HHbbtt --scouting --status
 
-# Per-task CRAB commands
-crab status   -d crab/<TAG>/<dlabel>_<year>_<dataset>/crab_<request>/
+# Per-task CRAB commands (fallback when the wrappers misbehave)
+crab status   -d crab/"$CAMPAIGN"/mcscouting_2024_HHbbtt/crab_<request>/
 crab resubmit -d crab/.../crab_.../
 crab resubmit -d ... --jobids 1,5,12
 crab resubmit -d ... --maxmemory 8000          # memory-killed jobs
 crab resubmit -d ... --maxjobruntime 3500      # timeouts
 crab getlog   -d ... --jobids 1
+
+# Loop over every task in a work area, one-line status each
+for d in crab/"$CAMPAIGN"/mcscouting_2024_HHbbtt/crab_*/; do
+  echo -n "$(basename "$d"): "
+  crab status -d "$d" 2>/dev/null | grep -m1 -E 'finished|failed|idle|running'
+done
 ```
 
 Common failure modes: high-jet-mult memory blow-up, UParT inference timeouts, T2_US_Purdue stageout retries, invalid input datasets. See `des/submission/monitoring.md`.
@@ -140,7 +139,7 @@ Common failure modes: high-jet-mult memory blow-up, UParT inference timeouts, T2
 
 EOS LFN: `/store/user/$PURDUE_USER/production/Scouting/$CAMPAIGN/<dlabel>_<year>/`
 xrootd at Purdue: `root://eos.cms.rcac.purdue.edu/store/user/$PURDUE_USER/...`
-Published datasets land in DBS `phys03` with tag `<original_tag>_DAZSLE_PFNano`.
+Published datasets land in DBS `phys03` with tag `<original_tag>_HHBBTT_CHSUParT` (CHS campaign; the legacy default was `_DAZSLE_PFNano`). Cross-submitter discovery: `dataset=/*/*HHBBTT_CHSUParT*/USER instance=prod/phys03`.
 
 ---
 
@@ -151,7 +150,10 @@ Published datasets land in DBS `phys03` with tag `<original_tag>_DAZSLE_PFNano`.
 | `crabby.py` | Submission entry point |
 | `crab_status.py` | Multi-task monitor → `CrabStatus.csv` |
 | `template_crab.py` | CRAB job template (5 GB / 4 cores / `phys03`) |
-| `configs/MC_2024_Scouting.py` | Main cmsRun config (scouting MC) |
+| `cards/chs_mc.yml` | CHS-campaign card (portable — pset resolved via `${CMSSW_AREA}`) |
+| `RUNBOOK_CHS.md` | Submitter quick path for the CHS campaign |
+| `ASSIGNMENTS.md` | Group → owner claims table |
+| `configs/MC_2024_Scouting.py` | Legacy cmsRun config (v15/v16 era) |
 | `configs/{MC,DATA}_*.py` | Other year/stream configs |
 | `customizations/customize.py` | Analysis-specific NanoAOD variables |
 | `datasets/*.json` | Sample catalogs |

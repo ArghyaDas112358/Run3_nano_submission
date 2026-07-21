@@ -1,0 +1,7 @@
+# DY-first launch on the CHS recipe — HISTORICAL RECORD (submitted 2026-07-17,
+# campaign complete 2026-07-21: 57.6M events published). Kept for provenance;
+# new submissions use cards/chs_mc.yml (identical content, general name).
+# ${CMSSW_AREA} comes from .env.
+campaign:
+  config: ${CMSSW_AREA}/src/ScoutingNanoProduction/scoutingnano_mc_hhbbtt.py
+  tag_extension: HHBBTT_CHSUParT

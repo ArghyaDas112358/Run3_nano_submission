@@ -1,0 +1,26 @@
+# CHS campaign submission assignments — NanoAODv17ScoutingCHS24
+
+Claim a group: put your name + CERN username in the row, push (or message
+Arghya). One `crabby.py` invocation per group — full commands in
+[`RUNBOOK_CHS.md`](RUNBOOK_CHS.md).
+
+Statuses: `open` → `claimed` → `testing` (1-unit self-test) → `submitted` →
+`done` (all tasks finished + published). Note any wall-clock/INVALID wrinkles
+in the Notes column.
+
+| group (`--dataset` key) | stems | ~scale | owner (CERN user) | status | notes |
+|---|---:|---|---|---|---|
+| `DYJetsNLO` | 5 | 3.4k jobs | Arghya (arghyara) | **done** | 57.6M evts published; 40to100 EOS-only (INVALID parent); 1 wall-clock job → recovery task |
+| `HHbbtt` (signal, full coupling scan) | 14 | small (each stem ~10⁶ evts, ~66% eff) | — | open | includes 4 ext1 stems |
+| `TT` | 3 | large (TTto4Q biggest) | — | open | |
+| `QCD-4Jets_HT` | 11 | **largest group** | — | open | low-HT bins huge + low eff; consider splitting 40-400 / 400+ between two people |
+| `VJetsLO` | 13 | large | — | open | 9 W + 4 Zto2Q |
+| `Diboson` | 5 | small | — | open | |
+
+**Not in this round:** `DYJetsLO` (GT mismatch: Winter24/133X parents vs the
+150X pset — deliberately excluded), data legs (need the data variant of the
+pset; separate round), everything else in `datasets/MC_2024.json`
+(SingleTop / single-H / HH4b / QCD_PT / EWKV — add only on group request).
+
+Campaign totals when complete: ~46 MC stems, ≈26 TB MC on EOS
+(+ ~10 TB data later; ≈36 TB total at 10 fb⁻¹ — within the approved budget).

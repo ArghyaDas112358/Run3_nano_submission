@@ -79,7 +79,13 @@ Generator: MadGraph MLM + Pythia8
 | 1500-2000 | `QCD-4Jets_Bin-HT-1500to2000` |
 | > 2000 | `QCD-4Jets_Bin-HT-2000` |
 
-Note: 2024 naming uses `Bin-HT-` prefix (vs `HT-` in 2022-2023).
+Note: 2024 naming inserts a `_Bin-` infix before HT/PT/PTQQ/PTG bin tags
+(e.g. `QCD-4Jets_Bin-HT-200to400` in 2024 vs `QCD-4Jets_HT-200to400` in
+2022/2023; same for `Wto2Q-3Jets_Bin-HT-…`, `Wto2Q-2Jets_Bin-PTQQ-…`,
+`WGtoLNuG-1Jets_Bin-PTG-…`, etc.). The selectors in `get_mc.py` use
+`*HT*`/`*PT*`/`*PTQQ*`/`*PTG-*` wildcards so they match both forms; if
+you tighten them back to `_HT*` they will silently miss every 2024
+dataset.
 
 #### QCD (pT-binned, 16 samples)
 

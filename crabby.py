@@ -25,7 +25,8 @@ import hashlib
 
 TAG = "25v2"
 
-DATASETS = ["JetMET", "EGamma", "Muon", "MuonEG", "BTagMu", "Tau"]
+DATASETS = ["JetMET", "EGamma", "Muon", "MuonEG", "BTagMu", "Tau",
+            "ParkingVBF", "ParkingSingleMuon"]
 
 CONFIGS = {
     "data": {
@@ -117,7 +118,7 @@ def make(card, datasets, base_crab_config, test: bool):
         card_info = {
             "_requestName_": request_name,
             "_workArea_": card["workArea"],
-            "_psetName_": card["config"],
+            "_psetName_": os.path.expandvars(card["config"]),
             "_inputDataset_": dataset,
             "_outLFNDirBase_": card["outLFNDirBase"],
             "_storageSite_": card["storageSite"],
@@ -166,7 +167,7 @@ def submit_wrapper(card, datasets, base_crab_config, test: bool):
         p.join()
 
 
-def status(card, datasets):
+def status(card, datasets, card_name=None):
     """Get status of crab jobs."""
     das_names = []
     for dataset in datasets:
@@ -201,7 +202,15 @@ def status(card, datasets):
             if "Output dataset:" in line:
                 das_names.append(line.split()[-1])
 
-    das_names_file = "outputs_{}.txt".format(args.card.split("/")[-1].split(".")[0])
+    if card_name is None:
+        # Back-compat: fall back to the legacy module-global ``args.card``.
+        _args = globals().get("args")
+        card_name = getattr(_args, "card", None) if _args is not None else None
+    if card_name:
+        stem = card_name.split("/")[-1].split(".")[0]
+    else:
+        stem = card.get("name", "status")
+    das_names_file = "outputs_{}.txt".format(stem)
     print("Writing output dataset DAS names to: {}".format(das_names_file))
     with open(das_names_file, "w") as das_file:
         das_file.write("\n".join(das_names))
@@ -244,15 +253,40 @@ def parse_args():
     parser.add_argument(
         "--scouting", default=False, action="store_true", help="Produce scouting samples"
     )
-    parser.add_argument("--campain", required=False, default="NanoAODv15Scouting24", type=str, help="Production campagn")
+    # Canonical spelling; --campain kept as a deprecated alias (see below).
+    parser.add_argument(
+        "--campaign",
+        dest="campaign",
+        required=False,
+        default="NanoAODv15Scouting24",
+        type=str,
+        help="Production campaign tag (used in workArea + outLFNDirBase).",
+    )
+    parser.add_argument(
+        "--campain",
+        dest="campaign",
+        required=False,
+        default=argparse.SUPPRESS,
+        type=str,
+        help=argparse.SUPPRESS,  # hidden — deprecated typo of --campaign
+    )
     args = parser.parse_args()
 
-    if (args.user == ""): 
+    # Deprecation warning if the user typed --campain (the typo).
+    import sys
+    if "--campain" in sys.argv:
+        print(
+            "WARNING: --campain is a deprecated typo of --campaign; please update "
+            "your scripts.  Both flags currently set the same value.",
+            file=sys.stderr,
+        )
+
+    if (args.user == ""):
         args.user = os.environ['USER'].split("-")[0]
 
-    if (args.campain != ""): 
+    if (args.campaign != ""):
         global TAG
-        TAG = args.campain
+        TAG = args.campaign
 
     return args
 
@@ -269,8 +303,22 @@ def main(args):
 
     isData = args.dataset in DATASETS
     dlabel = "data" if isData else "mc"
-    if args.scouting: 
-        dlabel = "datascouting" if isData else "mcscouting" 
+    if args.scouting:
+        dlabel = "datascouting" if isData else "mcscouting"
+        # Only 2024 has a distinct scouting pset; earlier years map to the
+        # same non-scouting config (see CONFIGS).  Warn so users don't think
+        # they got scouting output when they didn't.
+        if args.year != "2024" and CONFIGS.get(dlabel, {}).get(args.year) == CONFIGS["mc"].get(args.year):
+            import sys
+            print(
+                f"WARNING: --scouting has no effect for year {args.year}: "
+                f"the {dlabel} config for {args.year} is identical to the non-scouting "
+                f"config ({CONFIGS[dlabel].get(args.year, '<missing>')}). Only 2024 ships "
+                f"a dedicated scouting pset (MC_2024_Scouting.py). "
+                f"crab/{TAG}/{dlabel}_{args.year}_… work area names will still use the "
+                f"'{dlabel}' prefix, but the output will be standard NanoAOD.",
+                file=sys.stderr,
+            )
     # mc_campaign = MC_CAMPAIGNS[args.year]
     # miniaod_version = "MINIAODv4"
     if isData:
@@ -284,8 +332,8 @@ def main(args):
         "name": f"{dlabel}_{args.year}_{args.dataset}",
         "crab_template": "template_crab.py",
         "workArea": f"crab/{TAG}/{dlabel}_{args.year}_{args.dataset}",
-        "storageSite": "T2_US_Purdue",
-        "outLFNDirBase": f"/store/user/{args.user}/production/Scouting/{args.campain}/{dlabel}_{args.year}",
+        "storageSite": os.environ.get("STORAGE_SITE", "T2_US_Purdue"),
+        "outLFNDirBase": f"/store/user/{args.user}/production/Scouting/{args.campaign}/{dlabel}_{args.year}",
         "voGroup": None,
         "publication": True,
         "config": f"configs/{CONFIGS[dlabel][args.year]}",
@@ -325,7 +373,7 @@ def main(args):
         submit_wrapper(card, datasets, base_crab_config, args.test)
 
     if args.status:
-        status(card, datasets)
+        status(card, datasets, args.card)
 
 
 if __name__ == "__main__":
