@@ -26,7 +26,7 @@ import hashlib
 TAG = "25v2"
 
 DATASETS = ["JetMET", "EGamma", "Muon", "MuonEG", "BTagMu", "Tau",
-            "ParkingVBF", "ParkingSingleMuon"]
+            "ParkingVBF", "ParkingSingleMuon", "ScoutingHLT"]
 
 CONFIGS = {
     "data": {

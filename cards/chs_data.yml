@@ -1,0 +1,8 @@
+# CHS-campaign DATA card (NanoAODv17ScoutingCHS24) — PORTABLE.
+# Reads Run2024 HLTSCOUT with the DATA pset (no gen, FED-based L1, baked
+# preselection; data filter eff ~11%). crabby auto-applies LumiBased
+# splitting + the 2024 Golden JSON lumiMask for data keys.
+# ${CMSSW_AREA} comes from your .env.
+campaign:
+  config: ${CMSSW_AREA}/src/ScoutingNanoProduction/scoutingnano_data_hhbbtt.py
+  tag_extension: HHBBTT_CHSUParT

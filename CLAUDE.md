@@ -150,7 +150,7 @@ Published datasets land in DBS `phys03` with tag `<original_tag>_HHBBTT_CHSUParT
 | `crabby.py` | Submission entry point |
 | `crab_status.py` | Multi-task monitor → `CrabStatus.csv` |
 | `template_crab.py` | CRAB job template (5 GB / 4 cores / `phys03`) |
-| `cards/chs_mc.yml` | CHS-campaign card (portable — pset resolved via `${CMSSW_AREA}`) |
+| `cards/chs_mc.yml` / `cards/chs_data.yml` | CHS-campaign cards, MC / HLTSCOUT data (portable — pset via `${CMSSW_AREA}`) |
 | `RUNBOOK_CHS.md` | Submitter quick path for the CHS campaign |
 | `ASSIGNMENTS.md` | Group → owner claims table |
 | `configs/MC_2024_Scouting.py` | Legacy cmsRun config (v15/v16 era) |

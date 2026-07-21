@@ -17,10 +17,28 @@ in the Notes column.
 | `VJetsLO` | 13 | large | — | open | 9 W + 4 Zto2Q |
 | `Diboson` | 5 | small | — | open | |
 
+## DATA — Run2024 HLTSCOUT (`--dataset ScoutingHLT`, card `cards/chs_data.yml`)
+
+One row per era. `--dataset ScoutingHLT` submits ALL eras — if you take a
+single era, run `--make` alone and `crab submit` only your era's config
+(RUNBOOK §4b). File counts from DAS 2026-07-21.
+
+| era | files | owner (CERN user) | status | notes |
+|---|---:|---|---|---|
+| Run2024C | 21,692 | — | open | old campaign processed this era on the v16 recipe |
+| Run2024D | 21,624 | — | open | |
+| Run2024E | 31,335 | — | open | |
+| Run2024F | 70,447 | — | open | biggest single era |
+| Run2024G | 95,424 | — | open | consider two submitters / split by run range |
+| Run2024H | 13,795 | — | open | |
+| Run2024I | 28,250 | — | open | |
+
+Eras A/B (commissioning) + J (1 file) are deliberately excluded — the Golden
+JSON mask removes them anyway.
+
 **Not in this round:** `DYJetsLO` (GT mismatch: Winter24/133X parents vs the
-150X pset — deliberately excluded), data legs (need the data variant of the
-pset; separate round), everything else in `datasets/MC_2024.json`
+150X pset — deliberately excluded), everything else in `datasets/MC_2024.json`
 (SingleTop / single-H / HH4b / QCD_PT / EWKV — add only on group request).
 
-Campaign totals when complete: ~46 MC stems, ≈26 TB MC on EOS
-(+ ~10 TB data later; ≈36 TB total at 10 fb⁻¹ — within the approved budget).
+Campaign totals when complete: ~46 MC stems ≈26 TB + Run2024 data ≈10 TB
+(at 10 fb⁻¹) → ≈36 TB on EOS — within the approved budget.

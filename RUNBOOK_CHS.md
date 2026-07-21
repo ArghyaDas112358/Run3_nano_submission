@@ -81,6 +81,32 @@ python3 crabby.py --year 2024 --dataset <GROUP> --scouting --make --submit \
 Then mark the group `submitted` in ASSIGNMENTS.md. Publication is automatic
 (phys03). Check progress any time with `crab status -d <workdir>`.
 
+## 4b. DATA submissions (Run2024 HLTSCOUT)
+
+Same machinery, three differences — a different card, per-era claims, and
+scale. The DATA pset (`scoutingnano_data_hhbbtt.py`) has no gen block, keeps
+the FED-based L1 unpacking, and applies the same baked preselection (measured
+data efficiency ~11%). crabby automatically switches to **LumiBased splitting
++ the 2024 Golden JSON lumi mask** for data.
+
+```bash
+# self-test (one unit):
+python3 crabby.py --year 2024 --dataset ScoutingHLT --scouting --make --submit \
+    --test True --card cards/chs_data.yml \
+    --campaign NanoAODv17ScoutingCHS24 --user $CERN_USER
+
+# full era set (all 7 eras C-I in one go — check ASSIGNMENTS.md first!):
+rm -rf crab/NanoAODv17ScoutingCHS24/datascouting_2024_ScoutingHLT
+python3 crabby.py --year 2024 --dataset ScoutingHLT --scouting --make --submit \
+    --card cards/chs_data.yml --campaign NanoAODv17ScoutingCHS24 --user $CERN_USER
+```
+
+⚠ `--dataset ScoutingHLT` submits **all seven eras** (C–I, ~280k files
+total — era G alone is 95k files). If ASSIGNMENTS.md splits eras between
+people, use `--make` alone, then `crab submit` only your era's
+`submit_*Run2024X*.py` from the work area. Eras A/B/J are excluded
+(commissioning / 1 file; the Golden mask removes them anyway).
+
 ## 5. Known gotchas (read once — they will save you a resubmission)
 
 | symptom | cause / fix |
