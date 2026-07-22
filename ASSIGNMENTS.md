@@ -11,7 +11,7 @@ in the Notes column.
 | group (`--dataset` key) | stems | ~scale | owner (CERN user) | status | notes |
 |---|---:|---|---|---|---|
 | `DYJetsNLO` | 5 | 3.4k jobs | Arghya (arghyara) | **done** | 57.6M evts published; 40to100 EOS-only (INVALID parent); 1 wall-clock job → recovery task |
-| `HHbbtt` (signal, full coupling scan) | 14 | small (each stem ~10⁶ evts, ~66% eff) | Arghya (arghyara) | testing | includes 4 ext1 stems; test round 2026-07-22 |
+| `HHbbtt` (signal, full coupling scan) | 14 | small (each stem ~10⁶ evts, ~66% eff) | Arghya (arghyara) | **submitted** | full round 2026-07-22 (test 98/98 green, eff 52-74% per point) |
 | `TT` | 3 | large (TTto4Q biggest) | — | open | |
 | `QCD-4Jets_HT` | 11 | **largest group** | — | open | low-HT bins huge + low eff; consider splitting 40-400 / 400+ between two people |
 | `VJetsLO` | 13 | large | — | open | 9 W + 4 Zto2Q |
