@@ -17,6 +17,7 @@
 #############################################################
 
 CMSSW_VER="${CMSSW_VERSION:-CMSSW_16_1_0_pre4}"
+export SCRAM_ARCH="${SCRAM_ARCH_OVERRIDE:-el8_amd64_gcc13}"   # pre4 needs gcc13 (fresh shells may default to gcc12)
 SCOUT_FORK="${SCOUT_FORK:-https://github.com/ArghyaRanjanDas/ScoutingNanoProduction.git}"
 SCOUT_BRANCH="${SCOUT_BRANCH:-hhbbtt-chs-integration}"
 # FROZEN copy of JanFSchulte:derivedScouting as validated 2026-07 (+build fix).
@@ -55,8 +56,11 @@ if ! [ -f "$this_dir/cmssw/$CMSSW_VER/.installed" ]; then
     run_cmd cd $CMSSW_VER/src
     run_cmd eval `scramv1 runtime -sh`
 
-    # 1. Jan's CHS + scouting-UParT recipe
-    run_cmd git cms-merge-topic -u "$DERIVED_TOPIC"
+    # 1. The FROZEN validated recipe state (Jan's topic + conflict resolution
+    #    + build fix). checkout-topic takes the resolved tree AS-IS — never
+    #    use merge-topic here: pre4 already ships different PatFromScouting
+    #    files, so a re-merge always conflicts.
+    run_cmd git cms-checkout-topic -u "$DERIVED_TOPIC"
 
     # 2. HHbbtt production psets (baked preselection + whitelist v3)
     run_cmd git clone -b "$SCOUT_BRANCH" "$SCOUT_FORK" ScoutingNanoProduction
