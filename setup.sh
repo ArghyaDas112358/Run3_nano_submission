@@ -18,6 +18,14 @@
 
 CMSSW_VER="${CMSSW_VERSION:-CMSSW_16_1_0_pre4}"
 export SCRAM_ARCH="${SCRAM_ARCH_OVERRIDE:-el8_amd64_gcc13}"   # pre4 needs gcc13 (fresh shells may default to gcc12)
+
+# pre4 exists only for el8. On an el9 host (e.g. lxplus default) enter the
+# el8 container FIRST, then rerun this script:   cmssw-el8   (then ./setup.sh)
+if grep -qE "release 9" /etc/redhat-release 2>/dev/null && [ -z "${APPTAINER_CONTAINER:-}${SINGULARITY_CONTAINER:-}" ]; then
+  echo "ERROR: this is an el9 host and $CMSSW_VER is el8-only."
+  echo "       Run 'cmssw-el8' to enter the el8 container, then rerun ./setup.sh"
+  exit 1
+fi
 SCOUT_FORK="${SCOUT_FORK:-https://github.com/ArghyaRanjanDas/ScoutingNanoProduction.git}"
 SCOUT_BRANCH="${SCOUT_BRANCH:-hhbbtt-chs-integration}"
 # FROZEN copy of JanFSchulte:derivedScouting as validated 2026-07 (+build fix).
