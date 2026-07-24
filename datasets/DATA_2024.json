@@ -215,5 +215,26 @@
   "ScoutingHLT_Run2024G": "/ScoutingPFRun3/Run2024G-v1/HLTSCOUT",
   "ScoutingHLT_Run2024H": "/ScoutingPFRun3/Run2024H-v1/HLTSCOUT",
   "ScoutingHLT_Run2024I": "/ScoutingPFRun3/Run2024I-v1/HLTSCOUT"
+ },
+ "ScoutingHLT_Run2024C": {
+  "ScoutingHLT_Run2024C": "/ScoutingPFRun3/Run2024C-v1/HLTSCOUT"
+ },
+ "ScoutingHLT_Run2024D": {
+  "ScoutingHLT_Run2024D": "/ScoutingPFRun3/Run2024D-v1/HLTSCOUT"
+ },
+ "ScoutingHLT_Run2024E": {
+  "ScoutingHLT_Run2024E": "/ScoutingPFRun3/Run2024E-v1/HLTSCOUT"
+ },
+ "ScoutingHLT_Run2024F": {
+  "ScoutingHLT_Run2024F": "/ScoutingPFRun3/Run2024F-v1/HLTSCOUT"
+ },
+ "ScoutingHLT_Run2024G": {
+  "ScoutingHLT_Run2024G": "/ScoutingPFRun3/Run2024G-v1/HLTSCOUT"
+ },
+ "ScoutingHLT_Run2024H": {
+  "ScoutingHLT_Run2024H": "/ScoutingPFRun3/Run2024H-v1/HLTSCOUT"
+ },
+ "ScoutingHLT_Run2024I": {
+  "ScoutingHLT_Run2024I": "/ScoutingPFRun3/Run2024I-v1/HLTSCOUT"
  }
 }

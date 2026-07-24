@@ -101,11 +101,14 @@ python3 crabby.py --year 2024 --dataset ScoutingHLT --scouting --make --submit \
     --card cards/chs_data.yml --campaign NanoAODv17ScoutingCHS24 --user $CERN_USER
 ```
 
-⚠ `--dataset ScoutingHLT` submits **all seven eras** (C–I, ~280k files
-total — era G alone is 95k files). If ASSIGNMENTS.md splits eras between
-people, use `--make` alone, then `crab submit` only your era's
-`submit_*Run2024X*.py` from the work area. Eras A/B/J are excluded
+**Single-era claims (the normal case):** each era has its own dataset key —
+`--dataset ScoutingHLT_Run2024D` submits era D alone. `--dataset ScoutingHLT`
+submits **all seven eras at once** (C–I, ~280k files — era G alone is 95k),
+so only use it if you claimed the whole data leg. Eras A/B/J are excluded
 (commissioning / 1 file; the Golden mask removes them anyway).
+
+⚠ The `--card cards/chs_data.yml` flag is REQUIRED for data — there is no
+in-repo fallback config; without the card crabby stops with a clear error.
 
 ## 5. Known gotchas (read once — they will save you a resubmission)
 

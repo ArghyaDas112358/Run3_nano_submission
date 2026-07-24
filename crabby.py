@@ -26,7 +26,11 @@ import hashlib
 TAG = "25v2"
 
 DATASETS = ["JetMET", "EGamma", "Muon", "MuonEG", "BTagMu", "Tau",
-            "ParkingVBF", "ParkingSingleMuon", "ScoutingHLT"]
+            "ParkingVBF", "ParkingSingleMuon", "ScoutingHLT",
+            # per-era HLTSCOUT groups (single-era claims, RUNBOOK 4b)
+            "ScoutingHLT_Run2024C", "ScoutingHLT_Run2024D", "ScoutingHLT_Run2024E",
+            "ScoutingHLT_Run2024F", "ScoutingHLT_Run2024G", "ScoutingHLT_Run2024H",
+            "ScoutingHLT_Run2024I"]
 
 CONFIGS = {
     "data": {
@@ -336,7 +340,10 @@ def main(args):
         "outLFNDirBase": f"/store/user/{args.user}/production/Scouting/{args.campaign}/{dlabel}_{args.year}",
         "voGroup": None,
         "publication": True,
-        "config": f"configs/{CONFIGS[dlabel][args.year]}",
+        # No repo-shipped config exists for some dlabels (e.g. datascouting —
+        # the CHS data pset lives in the CMSSW area, supplied via the card).
+        "config": (f"configs/{CONFIGS[dlabel][args.year]}"
+                   if CONFIGS.get(dlabel, {}).get(args.year) else None),
         "tag_extension": "DAZSLE_PFNano",
         "tag_mod": None,
         "data": isData,
@@ -345,6 +352,11 @@ def main(args):
     }
 
     card = defaults | input_card
+
+    if not card["config"]:
+        exit(f"ERROR: no cmsRun config for '{dlabel}/{args.year}'. "
+             f"This category needs a card that provides one, e.g. "
+             f"--card cards/chs_data.yml (see RUNBOOK_CHS.md 4b).")
 
     work_area = Path(card["workArea"])
     if work_area.exists():
