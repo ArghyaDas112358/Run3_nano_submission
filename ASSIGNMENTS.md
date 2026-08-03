@@ -14,7 +14,8 @@ in the Notes column.
 | `HHbbtt` (signal, full coupling scan) | 14 | small (each stem ~10⁶ evts, ~66% eff) | Arghya (arghyara) | **submitted** | full round 2026-07-22 (test 98/98 green, eff 52-74% per point) |
 | `TT` | 3 | large (TTto4Q biggest) | — | open | |
 | `QCD-4Jets_HT` | 11 | **largest group** | — | open | low-HT bins huge + low eff; consider splitting 40-400 / 400+ between two people |
-| `VJetsLO` | 13 | large | — | open | 9 W + 4 Zto2Q |
+| `WJetsLO` | 9 | large (1.88 B evts) | — | open | **the analysis background** (W→lnu 4 + Wto2Q HT 5). Split out of VJetsLO 2026-07-25 |
+| `ZJetsLO` | 5 | 0.80 B evts | — | **deferred** | Zto2Q — not used as a background per the seniors' decision; test-round-validated, submit only if that changes |
 | `Diboson` | 5 | small | — | open | |
 
 ## DATA — Run2024 HLTSCOUT (`--dataset ScoutingHLT`, card `cards/chs_data.yml`)
