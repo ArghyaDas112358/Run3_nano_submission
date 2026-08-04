@@ -73,14 +73,35 @@ if ! [ -f "$this_dir/cmssw/$CMSSW_VER/.installed" ]; then
     # 2. HHbbtt production psets (baked preselection + whitelist v3)
     run_cmd git clone -b "$SCOUT_BRANCH" "$SCOUT_FORK" ScoutingNanoProduction
 
-    # 3. ONNX payloads. The producers resolve the taggers via edm::FileInPath
-    #    under RecoBTag/CombinedScouting/data/, and a CRAB worker only receives
-    #    what the sandbox ships from src/*/data/ — the fork carries the models
-    #    at its top level, and this copy (fork README step) was MANUAL until a
-    #    fresh build on lxplus shipped a sandbox without them and every job
-    #    died with FileInPathError (2026-08-04).
+    # 3. Payloads the fork README told humans to install by hand. Both were
+    #    done manually during bring-up, so OUR area worked and every FRESH
+    #    build was broken — the exact class of bug only a second user finds.
+    #
+    #    3a. ONNX taggers. Producers resolve them via edm::FileInPath under
+    #        RecoBTag/CombinedScouting/data/, and a CRAB worker only receives
+    #        what the sandbox ships from src/*/data/. Missing => every remote
+    #        job dies with FileInPathError (hit on lxplus 2026-08-04).
     run_cmd mkdir -p RecoBTag/CombinedScouting/data
     run_cmd cp ScoutingNanoProduction/model*.onnx RecoBTag/CombinedScouting/data/
+
+    #    3b. The preselection EDFilter. The psets do
+    #        cms.EDFilter("HHbbttPreselFilter", ...), but the .cc ships in the
+    #        FORK under plugins-patch/ and must be compiled INTO the topic
+    #        area. The fork README claims it is "already applied in the topic
+    #        area" — VERIFIED FALSE against a clean checkout of the frozen
+    #        topic (2026-08-04), so install it here. BuildFile.xml in the
+    #        frozen topic already carries the required <use> lines (checked
+    #        against plugins-patch/BuildFile.xml.reference); assert that
+    #        rather than assume it.
+    run_cmd cp ScoutingNanoProduction/plugins-patch/HHbbttPreselFilter.cc \
+               PhysicsTools/PatFromScouting/plugins/
+    for dep in DataFormats/PatCandidates DataFormats/Common DataFormats/Scouting; do
+      if ! grep -q "<use name=\"$dep\"/>" PhysicsTools/PatFromScouting/plugins/BuildFile.xml; then
+        echo "ERROR: BuildFile.xml is missing <use name=\"$dep\"/> — the filter will not link."
+        echo "       Compare with ScoutingNanoProduction/plugins-patch/BuildFile.xml.reference"
+        exit 1
+      fi
+    done
 
     run_cmd scram b -j8
     run_cmd cmsenv
@@ -93,13 +114,26 @@ if ! [ -f "$this_dir/cmssw/$CMSSW_VER/.installed" ]; then
 else
     run_cmd cd "$this_dir/cmssw/$CMSSW_VER/"
     run_cmd cmsenv
-    # Heal areas built before the ONNX-payload step existed: without these
-    # files every CRAB job fails remotely with FileInPathError.
-    if [ ! -f "src/RecoBTag/CombinedScouting/data/model_v3.onnx" ] && \
-       [ -d "src/ScoutingNanoProduction" ]; then
-      echo "Installing ONNX payloads into RecoBTag/CombinedScouting/data/ (was missing)..."
-      run_cmd mkdir -p src/RecoBTag/CombinedScouting/data
-      run_cmd cp src/ScoutingNanoProduction/model*.onnx src/RecoBTag/CombinedScouting/data/
+    # Heal areas built before the payload steps existed. Both failures are
+    # REMOTE-ONLY (the local area looks fine), so heal silently-correctly and
+    # rebuild only when the filter had to be added.
+    healed_needs_build=0
+    if [ -d "src/ScoutingNanoProduction" ]; then
+      if [ ! -f "src/RecoBTag/CombinedScouting/data/model_v3.onnx" ]; then
+        echo "Installing ONNX payloads into RecoBTag/CombinedScouting/data/ (were missing)..."
+        run_cmd mkdir -p src/RecoBTag/CombinedScouting/data
+        run_cmd cp src/ScoutingNanoProduction/model*.onnx src/RecoBTag/CombinedScouting/data/
+      fi
+      if [ ! -f "src/PhysicsTools/PatFromScouting/plugins/HHbbttPreselFilter.cc" ]; then
+        echo "Installing HHbbttPreselFilter.cc into the topic area (was missing)..."
+        run_cmd cp src/ScoutingNanoProduction/plugins-patch/HHbbttPreselFilter.cc \
+                   src/PhysicsTools/PatFromScouting/plugins/
+        healed_needs_build=1
+      fi
+    fi
+    if [ "$healed_needs_build" = "1" ]; then
+      echo "Rebuilding to compile the newly installed filter plugin..."
+      run_cmd cd src && run_cmd scram b -j8 && run_cmd cd ..
     fi
     run_cmd cd ../..
 fi
