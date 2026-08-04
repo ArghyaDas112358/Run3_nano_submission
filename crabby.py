@@ -73,6 +73,35 @@ def submit(config):
         print(hte.headers)
 
 
+def resolve_pset(raw: str) -> str:
+    """Expand the card's pset path and FAIL LOUDLY if it cannot work.
+
+    ``os.path.expandvars`` silently keeps ``${CMSSW_AREA}`` as a literal when
+    the variable is unset, so ``--make`` used to succeed and the user only hit
+    CRAB's opaque "Cannot find CMSSW configuration file ${CMSSW_AREA}/..."
+    at submit time (seen in the field on lxplus, 2026-08-04). Refuse here,
+    with the recipe, before anything is made or submitted.
+    """
+    pset = os.path.expandvars(raw)
+    if "$" in pset:
+        raise SystemExit(
+            f"pset path did not expand: {pset}\n"
+            "CMSSW_AREA is not set in this shell. Fix:\n"
+            "    cp .env.example .env   # once; then edit CMSSW_AREA etc.\n"
+            "    set -a; source .env; set +a\n"
+            "    ./setup.sh             # once, if the CMSSW area is not built yet\n"
+            "then re-run this command. See README.md 'Quick start' / RUNBOOK_CHS.md."
+        )
+    if not os.path.isfile(pset):
+        raise SystemExit(
+            f"pset file does not exist: {pset}\n"
+            "CMSSW_AREA points somewhere without the ScoutingNanoProduction package.\n"
+            "Run ./setup.sh (builds the area and checks the package out), or fix\n"
+            "CMSSW_AREA in .env to the area setup.sh created: <harness>/cmssw/<release>."
+        )
+    return pset
+
+
 def rnd_str(N, seedstr="test"):
     # Seed with dataset name hash to be reproducible
     random.seed(int(hashlib.sha512(seedstr.encode("utf-8")).hexdigest(), 16))
@@ -122,7 +151,7 @@ def make(card, datasets, base_crab_config, test: bool):
         card_info = {
             "_requestName_": request_name,
             "_workArea_": card["workArea"],
-            "_psetName_": os.path.expandvars(card["config"]),
+            "_psetName_": resolve_pset(card["config"]),
             "_inputDataset_": dataset,
             "_outLFNDirBase_": card["outLFNDirBase"],
             "_storageSite_": card["storageSite"],
