@@ -11,11 +11,33 @@ import copy
 import json
 from pathlib import Path
 
-# use python3 because crab client needs to call LumiList with python3 script
-from CRABAPI.RawCommand import crabCommand
-
-# from httplib import HTTPException
+# CRAB is imported LAZILY, inside submit(), on purpose.
+#
+# A module-scope `from CRABAPI.RawCommand import crabCommand` made the whole
+# tool unusable without a full CRAB environment — including `--make`, which
+# only writes text files and needs no CRAB at all. That broke the two-phase
+# `--make` -> inspect -> `--submit` workflow the docs prescribe, and greeted a
+# new collaborator with a bare ModuleNotFoundError (found by the cold-start
+# rehearsal, 2026-08-04). Our own shells always had crab-setup.sh sourced, so
+# this was invisible from the inside.
 from http.client import HTTPException
+
+
+def _crab_command():
+    """Import CRABAPI on demand, or explain exactly how to get it."""
+    try:
+        from CRABAPI.RawCommand import crabCommand
+    except ImportError:
+        raise SystemExit(
+            "CRAB client not available (no module named 'CRABAPI').\n"
+            "Only --submit and --status need it; --make works without.\n"
+            "To submit, set up CRAB in this shell first:\n"
+            "    source /cvmfs/cms.cern.ch/cmsset_default.sh\n"
+            "    cd \"$CMSSW_AREA/src\" && cmsenv && cd -\n"
+            "    source /cvmfs/cms.cern.ch/common/crab-setup.sh\n"
+            "See CLAUDE.md 'Every-session setup'."
+        )
+    return crabCommand
 
 # in python3, http.client replaces httplib
 import string
@@ -67,7 +89,7 @@ JSONS = {
 
 def submit(config):
     try:
-        crabCommand("submit", config=config)
+        _crab_command()("submit", config=config)
     except HTTPException as hte:
         print("Cannot execute command")
         print(hte.headers)
