@@ -73,6 +73,15 @@ if ! [ -f "$this_dir/cmssw/$CMSSW_VER/.installed" ]; then
     # 2. HHbbtt production psets (baked preselection + whitelist v3)
     run_cmd git clone -b "$SCOUT_BRANCH" "$SCOUT_FORK" ScoutingNanoProduction
 
+    # 3. ONNX payloads. The producers resolve the taggers via edm::FileInPath
+    #    under RecoBTag/CombinedScouting/data/, and a CRAB worker only receives
+    #    what the sandbox ships from src/*/data/ — the fork carries the models
+    #    at its top level, and this copy (fork README step) was MANUAL until a
+    #    fresh build on lxplus shipped a sandbox without them and every job
+    #    died with FileInPathError (2026-08-04).
+    run_cmd mkdir -p RecoBTag/CombinedScouting/data
+    run_cmd cp ScoutingNanoProduction/model*.onnx RecoBTag/CombinedScouting/data/
+
     run_cmd scram b -j8
     run_cmd cmsenv
     run_cmd cd "$this_dir"
@@ -84,5 +93,13 @@ if ! [ -f "$this_dir/cmssw/$CMSSW_VER/.installed" ]; then
 else
     run_cmd cd "$this_dir/cmssw/$CMSSW_VER/"
     run_cmd cmsenv
+    # Heal areas built before the ONNX-payload step existed: without these
+    # files every CRAB job fails remotely with FileInPathError.
+    if [ ! -f "src/RecoBTag/CombinedScouting/data/model_v3.onnx" ] && \
+       [ -d "src/ScoutingNanoProduction" ]; then
+      echo "Installing ONNX payloads into RecoBTag/CombinedScouting/data/ (was missing)..."
+      run_cmd mkdir -p src/RecoBTag/CombinedScouting/data
+      run_cmd cp src/ScoutingNanoProduction/model*.onnx src/RecoBTag/CombinedScouting/data/
+    fi
     run_cmd cd ../..
 fi
