@@ -4,3 +4,19 @@
 campaign:
   config: ${CMSSW_AREA}/src/ScoutingNanoProduction/scoutingnano_mc_hhbbtt.py
   tag_extension: HHBBTT_CHSUParT
+
+  # Datasets CRAB will not accept under the default `Automatic` splitting.
+  # The TaskWorker REFUSES (SUBMITREFUSED) any task whose input dataset has a
+  # block carrying >100,000 lumis -- resolving them would blow up the server's
+  # memory -- and the refusal lands AFTER the client says "Your task has been
+  # delivered", so the submit log looks clean and the only symptom is that no
+  # output file ever appears. FileBased is the only splitting that never looks
+  # lumi information up, so it is the only way through.
+  #
+  # `match` is a substring of the dataset path; first matching rule wins.
+  splitting_overrides:
+    # 789,230 lumis over 139 blocks -- one block is over the limit.
+    # Refused 2026-07-25 (task 260725_180144), diagnosed 2026-08-05.
+    - match: "WtoLNu-4Jets_Bin-4J"
+      splitting: FileBased
+      unitsPerJob: 1

@@ -62,13 +62,34 @@ python3 crabby.py --year 2024 --dataset <GROUP> --scouting --make --submit \
 
 **Self-test pass criteria** (~1–2 h after submission):
 1. every task printed `Success: Your task has been delivered…`;
-2. `crab status -d crab/NanoAODv17ScoutingCHS24/mcscouting_2024_<GROUP>/crab_<first-task>`
-   reaches `SUBMITTED` / jobs running;
+2. `crab status` reaches `SUBMITTED` / jobs running for **every** task;
 3. one output file lands under your
-   `/store/user/$CERN_USER/production/Scouting/NanoAODv17ScoutingCHS24/…`.
+   `/store/user/$CERN_USER/production/Scouting/NanoAODv17ScoutingCHS24/…`
+   **for every stem** — count the stems, not the tasks.
+
+> **"Delivered" is not "accepted".** The CRAB server can print
+> `Success: Your task has been delivered` and then have the TaskWorker
+> **refuse** the task. `crab.log` stays clean; the only symptom is a stem that
+> never produces a file. This is why criteria 2 and 3 exist — a self-test you
+> submit but never read back is not a test. `WtoLNu-4Jets_Bin-4J` sat refused
+> for eleven days exactly this way (2026-07-25 → 2026-08-05).
+>
+> The usual cause is `SUBMITREFUSED` with *"Block … contains more than 100000
+> lumis"*. Fix it with a `splitting_overrides` entry in your card
+> (`FileBased`, `unitsPerJob: 1`) — see `cards/chs_mc.yml` for the live
+> example — then resubmit that stem.
+
+Read every task back in one command:
+
+```bash
+for d in crab/NanoAODv17ScoutingCHS24/mcscouting_2024_<GROUP>/crab_*/; do
+  printf '%-52s ' "$(basename "$d" | cut -c6-57)"
+  crab status -d "$d" 2>/dev/null | grep -m1 -E 'Status on the CRAB server' || echo '<no status>'
+done
+```
 
 The physics content is already validated campaign-wide — your self-test only
-proves *your* proxy/stageout works.
+proves *your* proxy/stageout works, and that CRAB accepted every stem.
 
 ## 4. Full submission
 

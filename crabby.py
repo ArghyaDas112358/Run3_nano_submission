@@ -142,6 +142,41 @@ def str2bool(v):
         raise argparse.ArgumentTypeError("Boolean value expected.")
 
 
+def resolve_splitting(card, dataset):
+    """``(splitting, unitsPerJob)`` for one dataset, honouring card overrides.
+
+    CRAB's TaskWorker REFUSES a task whose input dataset has any block carrying
+    more than 100,000 lumis -- looking that many up would blow up the server's
+    memory -- and the only way through is a splitting mode that never consults
+    lumi information at all, i.e. ``FileBased``.
+
+    The trap is the timing: the refusal happens AFTER the client has printed
+    "Success: Your task has been delivered", so ``crab.log`` is clean, the
+    RUNBOOK's self-test criterion passes, and the only visible symptom is that
+    no output file ever appears. ``crab status`` says ``SUBMITREFUSED``. This
+    bit WtoLNu-4Jets_Bin-4J on 2026-07-25 and cost the group eleven days of
+    thinking that stem was fine.
+
+    Overrides are declared per card so the knowledge lives next to the campaign
+    it belongs to rather than in code::
+
+        splitting_overrides:
+          - match: "WtoLNu-4Jets_Bin-4J"     # substring of the dataset path
+            splitting: FileBased
+            unitsPerJob: 1
+
+    First matching rule wins. ``unitsPerJob`` is ``None`` when the rule does not
+    set one; note that ``Automatic`` splitting rejects ``unitsPerJob`` outright,
+    so a FileBased override must supply it.
+    """
+    default = "LumiBased" if card["data"] else "Automatic"
+    for rule in card.get("splitting_overrides") or []:
+        match = rule.get("match")
+        if match and match in dataset:
+            return rule.get("splitting", default), rule.get("unitsPerJob")
+    return default, None
+
+
 def make(card, datasets, base_crab_config, test: bool):
     """Make crab configs."""
     print("Making configs in {}:".format(card["workArea"]))
@@ -170,6 +205,11 @@ def make(card, datasets, base_crab_config, test: bool):
             request_name = dataset_name[:90] + rnd_str(8, dataset_name)
 
         verbatim_lines = []
+        splitting, split_units = resolve_splitting(card, dataset)
+        if splitting != ("LumiBased" if card["data"] else "Automatic"):
+            print("  [splitting override] {} -> {}{}".format(
+                dataset.split("/")[1], splitting,
+                "" if split_units is None else ", unitsPerJob = {}".format(split_units)))
         card_info = {
             "_requestName_": request_name,
             "_workArea_": card["workArea"],
@@ -178,7 +218,7 @@ def make(card, datasets, base_crab_config, test: bool):
             "_outLFNDirBase_": card["outLFNDirBase"],
             "_storageSite_": card["storageSite"],
             "_publication_": str(card["publication"]),
-            "_splitting_": "LumiBased" if card["data"] else "Automatic",
+            "_splitting_": splitting,
             "_outputDatasetTag_": tag,
         }
 
@@ -186,8 +226,12 @@ def make(card, datasets, base_crab_config, test: bool):
             verbatim_lines.append("config.Data.totalUnits = 1")
             card_info["_publication_"] = "False"
 
+        if split_units is not None:
+            verbatim_lines.append("config.Data.unitsPerJob = {}".format(split_units))
         if card["data"]:
-            verbatim_lines.append("config.Data.unitsPerJob = 50")
+            # the override, when it sets unitsPerJob, wins over the data default
+            if split_units is None:
+                verbatim_lines.append("config.Data.unitsPerJob = 50")
             verbatim_lines.append("config.JobType.maxJobRuntimeMin = 2750")
         if card["data"] and card["lumiMask"] is not None:
             verbatim_lines.append("config.Data.lumiMask = '{}'".format(card["lumiMask"]))
@@ -399,6 +443,8 @@ def main(args):
         "tag_mod": None,
         "data": isData,
         "lumiMask": f"jsons/{JSONS[args.year]}" if isData else None,
+        # per-dataset splitting rules; see resolve_splitting()
+        "splitting_overrides": [],
         "datasets": datasets,
     }
 
