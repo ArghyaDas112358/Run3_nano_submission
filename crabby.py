@@ -250,11 +250,47 @@ def make(card, datasets, base_crab_config, test: bool):
             cfg_file.write(crab_config)
 
 
+def assert_crab_python():
+    """Fail NOW if this interpreter cannot load a CRAB config, not mid-submission.
+
+    `crab` is a shell wrapper that picks its own interpreter, so `crab status`
+    works even when `python3` is the wrong one. `crabby.py` is not: it imports
+    the generated config in-process, which pulls in CRABClient and therefore
+    `past` (from `future`), shipped with the CMSSW python and absent from most
+    others. On a host whose login profile puts another python first -- a pixi
+    shim, a conda base -- `cmsenv` + `crab-setup.sh` are not enough, because the
+    profile has already won the PATH race.
+
+    Left unchecked this raises ModuleNotFoundError from inside the import of the
+    FIRST config, which for a nine-stem group is a coin flip away from dying
+    half way through and leaving some tasks submitted and some not.
+    """
+    import shutil
+    try:
+        import CRABClient.UserUtilities  # noqa: F401
+    except ImportError as exc:
+        raise SystemExit(
+            "ERROR: this python cannot import CRABClient ({}).\n"
+            "       interpreter: {}\n"
+            "       `crab` itself would still work -- it uses its own python -- but\n"
+            "       crabby.py imports the CRAB config in-process and needs the CMSSW\n"
+            "       one. Your login profile is probably shadowing it (pixi/conda).\n"
+            "       Start a clean shell, then redo the every-session setup:\n"
+            "           bash --noprofile --norc\n"
+            "           set -a; source .env; set +a\n"
+            "           source /cvmfs/cms.cern.ch/cmsset_default.sh\n"
+            "           cd $CMSSW_AREA/src && cmsenv && cd -\n"
+            "           source /cvmfs/cms.cern.ch/common/crab-setup.sh\n"
+            "       `command -v python3` must then be under .../CMSSW_*/external/."
+            .format(exc, shutil.which("python3") or "<unknown>"))
+
+
 def submit_wrapper(card, datasets, base_crab_config, test: bool):
     """Submit crab configs."""
     from multiprocessing import Process
     import imp
 
+    assert_crab_python()
     print("Submitting configs:")
     for dataset in datasets:
         print("   ==> " + dataset)
