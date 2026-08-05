@@ -8,15 +8,30 @@ Statuses: `open` → `claimed` → `testing` (1-unit self-test) → `submitted` 
 `done` (all tasks finished + published). Note any wall-clock/INVALID wrinkles
 in the Notes column.
 
+**Stage-out site is per-submitter, not per-campaign.** Use a site where YOUR
+grid identity has `/store/user` write access and set it in `.env`
+(`STORAGE_SITE`) — see the DATA section for the live example. Files landing on
+different T2s is expected and fine; discovery goes through DBS `phys03`, not
+through a shared directory.
+
 | group (`--dataset` key) | stems | ~scale | owner (CERN user) | status | notes |
 |---|---:|---|---|---|---|
-| `DYJetsNLO` | 5 | 3.4k jobs | Arghya (arghyara) | **done** | 57.6M evts published; 40to100 EOS-only (INVALID parent); 1 wall-clock job → recovery task |
-| `HHbbtt` (signal, full coupling scan) | 14 | small (each stem ~10⁶ evts, ~66% eff) | Arghya (arghyara) | **submitted** | full round 2026-07-22 (test 98/98 green, eff 52-74% per point) |
-| `TT` | 3 | large (TTto4Q biggest) | — | open | |
-| `QCD-4Jets_HT` | 11 | **largest group** | — | open | low-HT bins huge + low eff; consider splitting 40-400 / 400+ between two people |
-| `WJetsLO` | 9 | large (1.88 B evts) | — | open | **the analysis background** (W→lnu 4 + Wto2Q HT 5). Split out of VJetsLO 2026-07-25 |
-| `ZJetsLO` | 5 | 0.80 B evts | — | **deferred** | Zto2Q — not used as a background per the seniors' decision; test-round-validated, submit only if that changes |
-| `Diboson` | 5 | small | — | open | |
+| `DYJetsNLO` | 5 | 3.4k jobs | Arghya (arghyara) | **done** | 57.6M evts published; 2,985 files / 557 GB on Purdue EOS; 40to100 EOS-only (INVALID parent); 1 wall-clock job → recovery task |
+| `HHbbtt` (signal, full coupling scan) | 14 | small (each stem ~10⁶ evts, ~66% eff) | Arghya (arghyara) | **submitted** | full round 2026-07-22 (test 98/98 green, eff 52-74% per point) + 2 recovery tasks 2026-07-24. 10 coupling-point dirs / 150 files / 118 GB on EOS. **Not yet flipped to `done`: publication not re-confirmed since the recoveries — needs a `crab status` sweep** |
+| `TT` | 3 | large (TTto4Q biggest) | Irene (CERN user TBD) | **claimed** | 1-unit self-test **already green 3/3** (2026-07-25, submitted by arghyara) → skip RUNBOOK §3, go straight to §4. Clear the test workArea first: `rm -rf crab/NanoAODv17ScoutingCHS24/mcscouting_2024_TT` |
+| `WJetsLO` | 9 | large (1.88 B evts) | Arghya (arghyara) | **claimed** | **the analysis background** (W→lnu 4 + Wto2Q HT 5). Split out of VJetsLO 2026-07-25. Self-test **8/9**: `WtoLNu-4Jets_Bin-4J` was delivered but staged out NO file — diagnose that stem before the full round. Test area is `mcscouting_2024_VJetsLO` (pre-split name) |
+| `QCD-4Jets_HT` | 11 | **largest group** | — | open | **no self-test yet**. Low-HT bins huge + low eff; consider splitting 40-400 / 400+ between two people |
+| `Diboson` | 5 | small | — | open | no self-test yet |
+| `ZJetsLO` | 5 | 0.80 B evts | — | **deferred** | Zto2Q — not used as a background per the seniors' decision; self-test green 5/5 (2026-07-25), submit only if that changes |
+
+### Self-test round of 2026-07-25
+
+TT / WJetsLO / ZJetsLO were self-tested campaign-wide by arghyara with
+`--test True` (`totalUnits = 1`). Those task dirs live under the ordinary
+`mcscouting_2024_<GROUP>/` work areas, **not** under `testround_*`, so they
+look like full submissions in `ls` — they are not. The tell is
+`totalUnits = 1` in the task's `crab.log`, and a single few-MB file on EOS.
+Delete the work area before the full submit, as RUNBOOK §4 says.
 
 ## DATA — Run2024 HLTSCOUT (`--dataset ScoutingHLT`, card `cards/chs_data.yml`)
 
@@ -24,22 +39,60 @@ One row per era. `--dataset ScoutingHLT` submits ALL eras — if you take a
 single era, run `--make` alone and `crab submit` only your era's config
 (RUNBOOK §4b). File counts from DAS 2026-07-21.
 
-| era | files | owner (CERN user) | status | notes |
-|---|---:|---|---|---|
-| Run2024C | 21,692 | — | open | old campaign processed this era on the v16 recipe |
-| Run2024D | 21,624 | — | open | |
-| Run2024E | 31,335 | — | open | |
-| Run2024F | 70,447 | — | open | biggest single era |
-| Run2024G | 95,424 | — | open | consider two submitters / split by run range |
-| Run2024H | 13,795 | — | open | |
-| Run2024I | 28,250 | — | open | |
+**Coordinate before claiming**: one era, one submitter. Say which era you are
+taking in the channel before you submit.
+
+| era | files | owner (CERN user) | stage-out | status | notes |
+|---|---:|---|---|---|---|
+| Run2024C | 21,692 | — | — | open | old campaign processed this era on the v16 recipe |
+| Run2024D | 21,624 | Marc Huwiler (mhuwiler) | **T2_US_UCSD** | **submitted** | full era submitted 2026-08-05, task `260805_181416:mhuwiler_crab_ScoutingPFRun3_Run2024D-v1_HLTSCOUT` |
+| Run2024E | 31,335 | — | — | open | |
+| Run2024F | 70,447 | — | — | open | biggest single era |
+| Run2024G | 95,424 | — | — | open | consider two submitters / split by run range |
+| Run2024H | 13,795 | — | — | open | |
+| Run2024I | 28,250 | — | — | open | |
 
 Eras A/B (commissioning) + J (1 file) are deliberately excluded — the Golden
 JSON mask removes them anyway.
+
+### Why Run2024D stages out to UCSD
+
+Marc has no `/store/user` write permission at T2_US_Purdue, so the data round
+goes to UCSD (`/ceph/cms/store/user/mhuwiler/...`). That is the preferred
+outcome anyway — the data is the bulk of the campaign and this keeps it off
+the Purdue T2 quota. A Purdue write-permission request for external submitters
+is still worth making (Stefan is aware of the campaign), but it is **not** a
+blocker for this round.
+
+### Run2024D test-file validation (2026-08-05)
+
+One test file was checked before the full submission and passed on every axis
+that has bitten this campaign before:
+
+- **schema**: `ScoutingPFJetReclusterCHS` + the 6-class `scoutUParT`
+  (`probb/c/g/uds/taup/taum`, no `problepb`) — matches `SCOUTING_JET_ERA=chs`
+- **baked preselection ran**: `min(nJets) = 3`, and the smallest per-event
+  `max(BvsAll)` is `0.6500` — exactly the cut boundary
+- **tagger guard behaves as in MC**: 2.38% of jets carry the −1 sentinel, and
+  guard ⟺ (pT ≤ 15 or |η| ≥ 2.5) for 99.996% of jets; denominator −6, BvsAll
+  = 1/6 on guarded jets
+- **golden**: run 380534, LS 535, inside the certified range `[1, 746]`
+- the analysis define chain runs on it end to end (101 columns)
+
+Reference: 18,846 events, 105,543,255 bytes, one lumisection.
 
 **Not in this round:** `DYJetsLO` (GT mismatch: Winter24/133X parents vs the
 150X pset — deliberately excluded), everything else in `datasets/MC_2024.json`
 (SingleTop / single-H / HH4b / QCD_PT / EWKV — add only on group request).
 
-Campaign totals when complete: ~46 MC stems ≈26 TB + Run2024 data ≈10 TB
-(at 10 fb⁻¹) → ≈36 TB on EOS — within the approved budget.
+## Campaign size
+
+MC: ~46 stems ≈ 26 TB (675 GB of it produced so far — DY + signal).
+
+DATA: measured, not guessed — the Run2024D test file is **100.7 MB per
+lumisection** after the baked preselection. Against the golden JSON that is
+**≈ 2.2 TB for Run2024D** (23,209 golden LS) and **≈ 28 TB for all of 2024**
+(287,603 golden LS). Per-LS yield scales with instantaneous lumi, so treat
+these as ±50%, and note this sits below the ~60 TB working figure used in the
+2026-08-05 discussion — worth re-checking once Run2024D completes and a real
+era total is on disk.
