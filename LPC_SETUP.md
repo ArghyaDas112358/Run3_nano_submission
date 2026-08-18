@@ -31,7 +31,6 @@ Notes:
 ## Every session
 
 ```bash
-apptainer -s exec -B /cvmfs -B /uscms_data /cvmfs/unpacked.cern.ch/registry.hub.docker.com/cmssw/el8:x86_64 bash
 cd ~/nobackup/Run3_nano_submission
 set -a; source .env; set +a
 source /cvmfs/cms.cern.ch/cmsset_default.sh
