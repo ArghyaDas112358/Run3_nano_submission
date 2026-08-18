@@ -1,25 +1,27 @@
 #!/bin/bash
 # One-shot LPC bootstrap for Run3_nano_submission (written 2026-08-17).
 # Usage on any cmslpc node, from the repo root:   ./lpc_bootstrap.sh
-# Re-executes itself inside the el8 container (with the /uscms_data bind the
-# stock cmssw-el8 wrapper is missing), builds the CMSSW producer area via
-# ./setup.sh, and interactively writes your .env.
+# Builds the CMSSW producer area via ./setup.sh and interactively writes .env.
+#
+# NO CONTAINER by default: CMSSW_16_1_0_pre4 ships el8 AND el9 builds, so
+# setup.sh matches the host arch and runs natively on cmslpc-el8 and -el9 alike.
+# That also sidesteps the stock cmssw-el8 wrapper's missing /uscms_data bind,
+# which trapped users in $HOME. Force the old behaviour with USE_EL8_CONTAINER=1.
 set -e
 
 EL8_IMAGE=/cvmfs/unpacked.cern.ch/registry.hub.docker.com/cmssw/el8:x86_64
 
-if [ "$(grep -oP '(?<=release )\d+' /etc/redhat-release 2>/dev/null || echo 0)" != "8" ]; then
-  echo "[bootstrap] not on el8 - re-launching inside the el8 container..."
+if [ "${USE_EL8_CONTAINER:-0}" = "1" ] && \
+   [ "$(grep -oP '(?<=release )\d+' /etc/redhat-release 2>/dev/null || echo 0)" != "8" ]; then
+  echo "[bootstrap] USE_EL8_CONTAINER=1 - re-launching inside the el8 container..."
   exec apptainer -s exec -B /cvmfs -B /uscms_data "$EL8_IMAGE" bash "$(readlink -f "$0")"
 fi
 
 cd "$(dirname "$(readlink -f "$0")")"
-echo "[bootstrap] running in: $(pwd) (el8 container)"
+echo "[bootstrap] running in: $(pwd)  (host $(grep -oP '(?<=release )\d+' /etc/redhat-release 2>/dev/null || echo '?'), no container)"
 
-if ! git config --global user.github > /dev/null 2>&1; then
-  read -rp "[bootstrap] your GitHub username (needed by git cms-checkout-topic): " GH
-  git config --global user.github "$GH"
-fi
+# No user.github prompt: setup.sh initialises the area with
+# `git cms-init --upstream-only`, so your personal cmssw fork is never touched.
 
 if [ -d cmssw/CMSSW_16_1_0_pre4/src ]; then
   echo "[bootstrap] CMSSW area already exists - skipping setup.sh"

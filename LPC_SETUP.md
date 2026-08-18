@@ -11,13 +11,15 @@ ssh <you>@cmslpc-el9.fnal.gov
 cd ~/nobackup      # NOT your home dir - home has a 3 GB quota
 git clone -b NanoAODv17_CHS https://github.com/ArghyaRanjanDas/Run3_nano_submission
 cd Run3_nano_submission
-./lpc_bootstrap.sh    # handles the el8 container, CMSSW build, and your .env
+./lpc_bootstrap.sh    # CMSSW build + your .env (no container needed)
 crab createmyproxy --days 30
 ```
 
 Notes:
-- The bootstrap enters the el8 container itself. If you ever need it manually, the
-  stock `cmssw-el8` wrapper does NOT mount `/uscms_data` — use:
+- No container is needed: pre4 ships el8 AND el9 builds and `setup.sh` matches the
+  host. If you ever do want one, the stock `cmssw-el8` wrapper does NOT mount
+  `/uscms_data` (it only mounts the first two path components of your cwd, so from
+  $HOME you lose nobackup) — use:
   `apptainer -s exec -B /cvmfs -B /uscms_data /cvmfs/unpacked.cern.ch/registry.hub.docker.com/cmssw/el8:x86_64 bash`
 - `.env`: your own `CERN_USER`/`FNAL_USER`; `STORAGE_SITE=T3_US_FNALLPC` until your
   Purdue `/store/user` mapping exists (outputs get replicated to Purdue later —
