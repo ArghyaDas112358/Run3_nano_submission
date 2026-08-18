@@ -18,7 +18,7 @@ CMS scouting NanoAOD production for HH→bbττ. Submits CRAB jobs that read Min
    cd Run3_nano_submission
    ```
 
-2. **Build CMSSW** (one-time, ~15–25 min; needs `git config --global user.github <you>`):
+2. **Build CMSSW** (one-time, ~15–25 min; runs natively on el8 **and** el9 — no container):
    ```bash
    ./setup.sh    # CMSSW_16_1_0_pre4 + JanFSchulte:derivedScouting + the HHbbtt pset fork
    ```

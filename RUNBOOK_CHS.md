@@ -22,8 +22,8 @@ validated end-to-end). You are submitting more groups of the same campaign.
 git clone -b NanoAODv17_CHS https://github.com/ArghyaRanjanDas/Run3_nano_submission
 cd Run3_nano_submission
 
-git config --global user.github <your-github-username>   # needed by cms-merge-topic
 ./setup.sh                                # builds CMSSW_16_1_0_pre4 + recipe + psets
+                                          # el8 AND el9 hosts, no container, no GitHub fork touched
 
 cp .env.example .env                      # then edit:
 #   CERN_USER      = your CERN/grid username

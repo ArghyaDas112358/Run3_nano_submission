@@ -9,23 +9,33 @@
 #   2. the HHbbtt ScoutingNanoProduction fork (production psets
 #      with the baked preselection + whitelist)
 #
-# Prerequisites (one-time):
-#   git config --global user.github <your-github-username>
-#   (needed by git cms-merge-topic)
+# Prerequisites: none. Runs natively on el8 AND el9 hosts (no container), and
+# never touches your personal cmssw fork.
 #
 # Usage:  ./setup.sh          # first run builds (~15-25 min), later runs just cmsenv
 #############################################################
 
 CMSSW_VER="${CMSSW_VERSION:-CMSSW_16_1_0_pre4}"
-export SCRAM_ARCH="${SCRAM_ARCH_OVERRIDE:-el8_amd64_gcc13}"   # pre4 needs gcc13 (fresh shells may default to gcc12)
 
-# pre4 exists only for el8. On an el9 host (e.g. lxplus default) enter the
-# el8 container FIRST, then rerun this script:   cmssw-el8   (then ./setup.sh)
-if grep -qE "release 9" /etc/redhat-release 2>/dev/null && [ -z "${APPTAINER_CONTAINER:-}${SINGULARITY_CONTAINER:-}" ]; then
-  echo "ERROR: this is an el9 host and $CMSSW_VER is el8-only."
-  echo "       Run 'cmssw-el8' to enter the el8 container, then rerun ./setup.sh"
-  exit 1
+_this_file="$( [ ! -z "$ZSH_VERSION" ] && echo "${(%):-%x}" || echo "${BASH_SOURCE[0]}" )"
+_this_dir="$( cd "$( dirname "$_this_file" )" && pwd )"
+_existing_arch="$(ls "$_this_dir/cmssw/$CMSSW_VER/.SCRAM" 2>/dev/null | grep -m1 -E '^el[0-9]+_')"
+
+# pre4 ships BOTH el8 and el9 builds (same gcc13), so a fresh build just matches
+# the host and NO container is needed anywhere (el9 nodes included). Fresh shells
+# may default to gcc12 -> always set it explicitly.
+# An area that already exists keeps the arch it was BUILT with: re-running this
+# from a different host must never cmsenv an el8 area with an el9 arch.
+if [ -n "${SCRAM_ARCH_OVERRIDE:-}" ]; then
+  export SCRAM_ARCH="$SCRAM_ARCH_OVERRIDE"
+elif [ -n "$_existing_arch" ]; then
+  export SCRAM_ARCH="$_existing_arch"
+elif grep -qE "release 9" /etc/redhat-release 2>/dev/null; then
+  export SCRAM_ARCH="el9_amd64_gcc13"
+else
+  export SCRAM_ARCH="el8_amd64_gcc13"
 fi
+echo "SCRAM_ARCH=$SCRAM_ARCH  ($CMSSW_VER)"
 SCOUT_FORK="${SCOUT_FORK:-https://github.com/ArghyaRanjanDas/ScoutingNanoProduction.git}"
 SCOUT_BRANCH="${SCOUT_BRANCH:-hhbbtt-chs-integration}"
 # FROZEN copy of JanFSchulte:derivedScouting as validated 2026-07 (+build fix).
@@ -49,9 +59,7 @@ run_cmd source /cvmfs/cms.cern.ch/cmsset_default.sh
 
 if ! [ -f "$this_dir/cmssw/$CMSSW_VER/.installed" ]; then
     if ! git config --get user.github > /dev/null; then
-      echo "ERROR: set your GitHub username first:"
-      echo "  git config --global user.github <your-github-username>"
-      exit 1
+      echo "note: user.github is unset — fine, the checkout below is upstream-only."
     fi
     run_cmd mkdir -p "$this_dir/cmssw"
     run_cmd cd "$this_dir/cmssw"
@@ -62,7 +70,14 @@ if ! [ -f "$this_dir/cmssw/$CMSSW_VER/.installed" ]; then
     echo "Creating $CMSSW_VER area in $PWD ..."
     run_cmd scramv1 project CMSSW $CMSSW_VER
     run_cmd cd $CMSSW_VER/src
-    run_cmd eval `scramv1 runtime -sh`
+    run_cmd eval `scramv1 runtime -sh </dev/null`
+
+    # 0. Initialise the git area OURSELVES, upstream-only. git cms-checkout-topic
+    #    would otherwise call `git cms-init` with no options (the --upstream-only
+    #    default is set for cms-merge-topic ONLY), which registers your personal
+    #    cmssw fork as remote `my-cmssw` and fetches every branch it has —
+    #    thousands of refs nobody needs here.
+    run_cmd git cms-init --upstream-only
 
     # 1. The FROZEN validated recipe state (Jan's topic + conflict resolution
     #    + build fix). checkout-topic takes the resolved tree AS-IS — never
